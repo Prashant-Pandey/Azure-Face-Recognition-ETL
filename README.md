@@ -18,7 +18,6 @@ Emotion: only the ones which are one in it
 Occlusion: blocking parts[ eyeOccluded, foreheadOccluded, and mouthOccluded ]
 Smile: 0-1 [send a text for it]
 
-Ocp-Apim-Subscription-Key = 1f1f44642d60497ab4ed3c169097f038
 step #1: detect face # id = dc3a7510-a9a0-449d-9cfa-659e2880e53a
 step #2: person group # id = friends-group
 step #3: create person group person # person-id = c010f3f1-1ae3-42e6-b221-0b3bccf38a7e 
