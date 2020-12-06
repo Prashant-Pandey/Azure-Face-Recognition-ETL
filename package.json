@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "ETL API for Microsoft Azure Face Recognition to simplify the API Interface with a strong documentation",
   "main": "server.js",
+  "engines": {
+    "node": ">=10.16.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,7 +25,6 @@
   "dependencies": {
     "axios": "^0.21.0",
     "body-parser": "^1.19.0",
-    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "multer": "^1.4.2",
     "swagger-jsdoc": "^4.2.0",

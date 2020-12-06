@@ -17,10 +17,22 @@ Head pos: may be tilted [still deciding]
 Emotion: only the ones which are one in it
 Occlusion: blocking parts[ eyeOccluded, foreheadOccluded, and mouthOccluded ]
 Smile: 0-1 [send a text for it]
-
+https://eastus.dev.cognitive.microsoft.com/docs/services/563879b61984550e40cbbe8d/operations/563879b61984550f3039523b/console
+OCMP Subscription Code: 1f1f44642d60497ab4ed3c169097f038
 step #1: detect face # id = dc3a7510-a9a0-449d-9cfa-659e2880e53a
 step #2: person group # id = friends-group
 step #3: create person group person # person-id = c010f3f1-1ae3-42e6-b221-0b3bccf38a7e 
 step #5: create and add face to the person # direct image url send -> # persistedFaceId: 678b77c9-6115-49c9-98a3-72c9365cedfe
 step 5 must have only one image
 test against -> https://i.pinimg.com/originals/27/27/44/27274483c7861355374b32330fcad289.jpg
+
+
+{
+  "personId": "c010f3f1-1ae3-42e6-b221-0b3bccf38a7e",
+  "persistedFaceIds": ["678b77c9-6115-49c9-98a3-72c9365cedfe"],
+  "name": "My-friend-1",
+  "userData": "nearnest friend"
+}
+
+
+2ba479b9-102d-4f40-9240-f67ff55e36a8
