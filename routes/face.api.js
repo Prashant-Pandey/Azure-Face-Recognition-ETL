@@ -2,6 +2,19 @@ const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const connectAPI = require("../service/api.service");
 
+
+/**
+ * @swagger
+ * /face:
+ *  post:
+ *    content:
+ *      type: application/json
+ *    description: Send all the images to be recognized
+ *    responses:
+ *      '200': 
+ *        description: A successful response
+ */
+
 router.post('/', upload.single('img'), async (req, res) => {
   const fileName = req.imgFileName;
   const imageUrl = 'https://i.pinimg.com/originals/27/27/44/27274483c7861355374b32330fcad289.jpg';

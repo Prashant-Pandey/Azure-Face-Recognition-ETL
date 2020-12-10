@@ -13,23 +13,31 @@ app.use('/face', faceAPI);
 app.use('/facelist', faceListAPI);
 app.use('/facelistlarge', faceListLargeAPI);
 
-// const swaggerOptions = {
-//     swaggerDefinition: {
-//         info: {
-//             title: 'Company API',
-//             version: '1.0.0',
-//             description: 'API for company listing'
-//         },
-//         host: '0.0.0.0:4001',
-//         basePath: '/'
-//     },
-//     apis: [
-//         './index.js'
-//     ]
-// };
+const swaggerOptions = {
+    swaggerDefinition: {
+        info: {
+            title: 'Azure Face ETL API',
+            version: '1.0.0',
+            description: 'API for company listing'
+        },
+        host: 'http://localhost:4000',
+        basePath: '/'
+    },
+    apis: [
+        './routes/face.api.js',
+        './routes/facelist.api.js',
+        './routes/facelist.large.api.js',
+        './routes/person.api.js',
+        './routes/persongroup.api.js',
+        './routes/persongroup.large.api.js',
+        './routes/persongroup.large.person.api.js',
+        './routes/persongroup.person.api.js',
+        './routes/snapshot.api.js'
+    ]
+};
 
-// const specs = swaggerJSDoc(swaggerOptions);
+const specs = swaggerJSDoc(swaggerOptions);
 
-// app.use('/api/v1/docs', swaggerUI.serve, swaggerUI.setup(specs));
+app.use('/api/docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 app.listen(4000, () => console.log('now graphql at localhost:4000'));
