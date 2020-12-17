@@ -3,37 +3,31 @@ require("dotenv").config();
 const swaggerJSDoc = require("swagger-jsdoc")
 const swaggerUI = require('swagger-ui-express')
 var app = express();
-const faceAPI = require("./routes/face.api");
-const faceListAPI = require("./routes/facelist.api");
-const faceListLargeAPI = require("./routes/facelist.large.api");
-const personListLargeAPI = require("./routes/persongroup.large.api");
-const personLargeAPI = require("./routes/persongroup.large.person.api")
+const v1 = require("./routes/");
 
 app.use('/uploads', express.static('./uploads/'));
 app.use(express.json())
-app.use('/face', faceAPI);
-app.use('/facelist', faceListAPI);
-app.use('/largefacelist', faceListLargeAPI);
-app.use('/largepersonlist', personListLargeAPI);
-app.use('/largeperson', personLargeAPI);
+app.use('/v1', v1);
 
-// const swaggerOptions = {
-//     swaggerDefinition: {
-//         info: {
-//             title: 'Company API',
-//             version: '1.0.0',
-//             description: 'API for company listing'
-//         },
-//         host: '0.0.0.0:4001',
-//         basePath: '/'
-//     },
-//     apis: [
-//         './index.js'
-//     ]
-// };
+const swaggerOptions = {
+    swaggerDefinition: {
+        info: {
+            title: 'Azure ETL API',
+            version: '1.0.0',
+            description: 'ETL API which makes seamless and fast integration of Azure Face API'
+        },
+        host: '0.0.0.0:4001',
+        basePath: '/v1'
+    },
+    apis: [
+        './routes/face.api.js',
+        './routes/facelist.api.js',
+        './routes/persongroup.api.js',
+    ]
+};
 
-// const specs = swaggerJSDoc(swaggerOptions);
+const specs = swaggerJSDoc(swaggerOptions);
 
-// app.use('/api/v1/docs', swaggerUI.serve, swaggerUI.setup(specs));
+app.use('/api/v1/docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 app.listen(4000, () => console.log('now graphql at localhost:4000'));

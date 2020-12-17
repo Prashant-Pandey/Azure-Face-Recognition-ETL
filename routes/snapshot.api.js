@@ -14,7 +14,7 @@ router.post('/:snapshot_id', async (req, res) => {
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
 
   const response = await connectAPI(`snapshots`, {}, body, azureId, 'post');
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 
@@ -53,7 +53,7 @@ router.delete('/:snapshot_id', async (req, res) => {
   const response = await connectAPI(`snapshots/${snapshot_id}`, {}, {}, azureId, 'delete');
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -67,7 +67,7 @@ router.get('/:snapshot_id', async (req, res) => {
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -81,7 +81,7 @@ router.get('/operation/:operation_id', async (req, res) => {
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -97,7 +97,7 @@ router.get('/', async (req, res) => {
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -120,7 +120,7 @@ router.patch('/:snapshot_id', async (req, res) => {
 
   const response = await connectAPI(`snapshots/${snapshot_id}`, {}, body, azureId, 'patch');
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 
@@ -143,7 +143,7 @@ router.patch('/face/:persistedFaceId', async (req, res) => {
 
   const response = await connectAPI(`largepersongroups/${largePersonGroupId}/persons/${personId}/persistedfaces/${persistedFaceId}`, {}, body, azureId, 'patch');
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 

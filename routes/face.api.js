@@ -2,15 +2,15 @@ const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
 const connectAPI = require("../service/api.service");
-const { getFaceDetection, getLimitedFaceDetection } = require("../service/face.service")
+const { getFaceDetection, getLimitedFaceDetection, getSimilarFaces } = require("../service/face.service")
 
 router.post('/', upload.single('img'), uploadToAzure, async (req, res) => {
   try {
+    console.log(req.body, 'inside the function');
     // check input 
-    const { location, features, landmark, emotions, characterstics, noises } = req.body;
+    const { location, features, landmark, emotions, characterstics, noises, azureId } = req.body;
     // create params for the azure face api
     const imageUrl = req.imgFileURL;
-    const { azureId } = req.body;
 
     if (!location && !features && !landmark && !emotions && !characterstics && !noises) {
       return res.json(await getFaceDetection(imageUrl, azureId));
@@ -35,30 +35,27 @@ router.post('/', upload.single('img'), uploadToAzure, async (req, res) => {
 router.post(
   '/similar',
   upload.single('img'),
-  uploadToAzure, async (req, res) => {
+  uploadToAzure,
+  async (req, res) => {
     const {
-      // faceId,
-      // largeFaceListId,
+      faceId,
+      faceListId,
+      largeFaceListId,
+      faceIds,
       maxFaceLimit,
       mode,
       azureId
     } = req.body;
 
-    // const body = {
-    //   faceId,
-    //   largeFaceListId,
-    //   "maxNumOfCandidatesReturned": maxFaceLimit,
-    //   mode
-    // }
+    const imageUrl = req.imgFileURL;
 
-    // const response = await connectAPI('findsimilars', {}, body, azureId, 'post');
-    // if (response.error) {
-    //   res.status(response.status).json(response.message);
-    //   return;
-    // }
+    const response = await getSimilarFaces(imageUrl, faceId, faceListId, largeFaceListId, faceIds, maxFaceLimit, mode, azureId);
 
-    // res.json(response)
-    res.json({one:'one'})
+    if (response.error) {
+      return res.status(response.status).send(response);
+    }
+
+    return res.json(response);
   }
 );
 
@@ -69,10 +66,9 @@ router.post('/group', async (req, res) => {
   const body = { faceIds };
 
   const response = await connectAPI('group', {}, body, azureId, 'post');
-  console.log(response.error);
+
   if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
+    res.status(response.status).send(response);
     return;
   }
 

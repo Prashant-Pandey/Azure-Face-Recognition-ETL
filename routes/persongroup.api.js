@@ -1,36 +1,107 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
-const connectAPI = require("../service/api.service");
+const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
+const { createPersonList, deletePersonList, getPersonList, getPersonListTrainingStatus, getPersonLists, trainPersonList, updatePersonList, createPerson, addPersonFace, deletePerson, deletePersonFace,
+  getPersonDetails, getPersonFaceDetails, updatePerson,
+  updatePersonFace } = require("../service/person.list.service");
 
-router.put('/:personGroupId', async (req, res) => {
-  const { azureId, name, userData } = req.body;
-  const { personGroupId } = req.params
+router.post('/:personGroupId/train', async (req, res) => {
+  const {
+    azureId
+  } = req.body;
 
-  const body = {
-    name,
-    userData,
-    recognitionModel: 'recognition_03'
+  const { personGroupId } = req.params;
+
+  const response = await trainPersonList(personGroupId, azureId);
+  if (response.error) {
+    res.status(response.status).json(response);
+    return;
   }
 
-  const response = await connectAPI(`persongroups/${personGroupId}`, {}, body, azureId, 'put');
+  res.json({ success: true })
+});
+// create person
+router.post('/:personGroupId/person', async (req, res) => {
+  const { name, userData, azureId } = req.body;
+  const { personGroupId } = req.params;
+
+  const response = await createPerson(personGroupId, name, userData, azureId);
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
   res.json(response);
+});
+// create person face
+router.post('/:personGroupId/:personId', upload.single('img'), uploadToAzure, async (req, res) => {
+  const {
+    userData,
+    targetFace,
+    azureId
+  } = req.body;
+  const imageUrl = req.imgFileURL;
+  const { personGroupId, personId } = req.params;
+
+  const response = await addPersonFace(personGroupId, personId, userData, targetFace, imageUrl, azureId);
+
+  if (response.error) {
+    return res.status(response.status).json(response);
+  }
+
+  return res.json(response);
+});
+
+router.delete('/:personGroupId/:personId/:persistedFaceId', async (req, res) => {
+  const { persistedFaceId, personId, personGroupId } = req.params;
+  const { azureId } = req.body;
+  const response = await deletePersonFace(persistedFaceId, personId, personGroupId, azureId);
+
+  if (response.error) {
+    return res.status(response.status).send(response);
+  }
+
+  res.json({ success: true });
+});
+
+router.delete('/:personGroupId/:personId', async (req, res) => {
+  const { azureId } = req.body;
+  const { personId, personGroupId } = req.params;
+
+  const response = await deletePerson(personId, personGroupId, azureId);
+  if (response.error) {
+    res.status(response.status);
+    res.send(response);
+    return;
+  }
+
+  res.json({ success: true });
 });
 
 router.delete('/:personGroupId', async (req, res) => {
   const { azureId } = req.body;
   const { personGroupId } = req.params;
 
-  const response = await connectAPI(`persongroups/${personGroupId}`, {}, {}, azureId, 'delete');
+  const response = await deletePersonList(personGroupId, azureId);
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
+    return;
+  }
+
+  return res.json({ success: true });
+});
+
+router.get('/', async (req, res) => {
+  const { azureId, start, top } = req.body;
+
+  const response = await getPersonLists(start, top, azureId);
+
+  if (response.error) {
+    res.status(response.status);
+    res.send(response);
     return;
   }
 
@@ -39,15 +110,13 @@ router.delete('/:personGroupId', async (req, res) => {
 
 router.get('/:personGroupId', async (req, res) => {
   const { azureId } = req.body;
-  const { personGroupId } = req.params
-  const params = {
-    returnRecognitionModel: false
-  }
-  const response = await connectAPI(`persongroups/${personGroupId}`, params, {}, azureId, 'get');
+  const { personGroupId, start, top } = req.params
+
+  const response = await getPersonList(personGroupId, start, top, azureId);
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -57,66 +126,109 @@ router.get('/:personGroupId', async (req, res) => {
 router.get('/:personGroupId/train', async (req, res) => {
   const { azureId } = req.body;
   const { personGroupId } = req.params
-  const response = await connectAPI(`persongroups/${personGroupId}/training`, {}, {}, azureId, 'get');
+  const response = await getPersonListTrainingStatus(personGroupId, azureId);
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
   res.json(response);
 });
 
-router.get('/', async (req, res) => {
-  const { azureId, returnRecognitionModel, start, top } = req.body;
-  const params = {
-    start, 
-    top,
-    returnRecognitionModel
-  }
-  const response = await connectAPI(`persongroups`, params, {}, azureId, 'get');
+router.get('/:personGroupId/:personId', async (req, res) => {
+  const { azureId } = req.body;
+  const { personGroupId, personId } = req.params
+  const response = await getPersonDetails(personGroupId, personId, azureId);
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
   res.json(response);
 });
 
-router.post('/:personGroupId/train', async (req, res) => {
-  const {
-    azureId
-  } = req.body;
+router.get('/:personGroupId/:personId/:persistedFaceId', async (req, res) => {
+  const { azureId } = req.body;
+  const { persistedFaceId, personGroupId, personId } = req.params
+  const response = await getPersonFaceDetails(persistedFaceId, personGroupId, personId, azureId);
 
+  if (response.error) {
+    res.status(response.status);
+    res.send(response);
+    return;
+  }
+
+  res.json(response);
+});
+
+router.put('/:personGroupId', async (req, res) => {
+  const { azureId, name, userData } = req.body;
   const { personGroupId } = req.params;
 
-  const response = await connectAPI(`persongroups/${personGroupId}/train`, {}, {}, azureId, 'post');
+  const response = await createPersonList(name, userData, personGroupId, azureId);
+
   if (response.error) {
-    res.status(response.status).json(response.message);
-    return;
+    return res.status(response.status).send(response);
   }
 
-  res.json(response)
+  return res.json({ success: true });
 });
 
 router.patch('/:personGroupId', async (req, res) => {
   const {
+    name,
+    userData,
     azureId
   } = req.body;
 
   const { personGroupId } = req.params;
 
-  const response = await connectAPI(`persongroups/${personGroupId}`, {}, {}, azureId, 'patch');
+  const response = await updatePersonList(personGroupId, name, userData, azureId);
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 
   res.json(response)
 });
+
+router.patch('/:personGroupId/:personId', async (req, res) => {
+  const {
+    userData,
+    azureId
+  } = req.body;
+
+  const { personId, personGroupId } = req.params;
+
+  const response = await updatePerson(personId, personGroupId, userData, azureId);
+  if (response.error) {
+    return res.status(response.status).json(response);
+  }
+
+  res.json(response)
+});
+
+router.patch('/:personGroupId/:personId/:persistedFaceId', async (req, res) => {
+  const {
+    userData,
+    azureId
+  } = req.body;
+
+  const { personGroupId, personId, persistedFaceId } = req.params;
+
+  const response = await updatePersonFace(personId, personGroupId, persistedFaceId, userData, azureId);
+  if (response.error) {
+    res.status(response.status).json(response);
+    return;
+  }
+
+  res.json(response)
+});
+
 
 
 module.exports = router;

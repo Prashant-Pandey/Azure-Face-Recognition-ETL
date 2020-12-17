@@ -25,7 +25,7 @@ async function createFaceList(name, description, faceListId, azureId){
     recognitionModel: "recognition_03"
   }
 
-  const response = await connectAPI(`facelists/${faceListId}`, {}, body, azureId, 'put');
+  return await connectAPI(`facelists/${faceListId}`, {}, body, azureId, 'put');
 }
 
 async function deleteFaceList(faceListId, azureId){

@@ -35,10 +35,18 @@ async function deleteFaceFromFaceList(faceListId, persistedFaceId, azureId) {
   return await connectAPI(`largefacelists/${faceListId}/persistedFaces/${persistedFaceId}`, {}, {}, azureId, 'delete');
 }
 
-async function getFaceList(faceListId, azureId) {
+async function getFaceList(faceListId, start = '', top = 0, azureId) {
   const params = {
     returnRecognitionModel: true
   }
+  if (start !== '') {
+    params["start"] = start;
+  }
+
+  if (top !== 0) {
+    params["top"] = top;
+  }
+  
   return await connectAPI(`largefacelists/${faceListId}`, params, {}, azureId, 'get')
 }
 
@@ -72,23 +80,9 @@ async function updateFaceList(faceListId, name = '', userData = '', azureId) {
   return await connectAPI(`largefacelists/${faceListId}`, {}, body, azureId, 'patch');
 }
 
-async function getFaceListFace(largeFaceListId, persistedFaceId = '', start = '', top = '', azureId) {
-
-  const params = {}
-  let requestURL = `largefacelists/${largeFaceListId}/persistedfaces`
-  if (persistedFaceId !== '') {
-    requestURL += `/${persistedFaceId}`
-  } else {
-    if (start !== '') {
-      params["start"] = start;
-    }
-
-    if (top !== '') {
-      params["top"] = top;
-    }
-  }
-
-  return await connectAPI(requestURL, params, {}, azureId, 'get');
+async function getFaceListFace(largeFaceListId, persistedFaceId, azureId) {
+  let requestURL = `largefacelists/${largeFaceListId}/persistedfaces/${persistedFaceId}`
+  return await connectAPI(requestURL, {}, {}, azureId, 'get');
 
 }
 

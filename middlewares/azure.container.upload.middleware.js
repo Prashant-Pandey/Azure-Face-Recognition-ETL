@@ -10,6 +10,9 @@ async function uploadToAzure(req, res, next) {
   try {
     // get the file from server
     const fileName = req.imgFileName;
+    if (!fileName) {
+      return next();
+    }
     const filePath = staticStorage + fileName;
     const file = await fs.readFileSync(filePath);
     // upload data to azure

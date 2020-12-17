@@ -19,7 +19,7 @@ router.post('/:faceListId/face', upload.single('img'), uploadToAzure, async (req
   const response = await addFace(faceListId, userData, targetFace, imageUrl, azureId)
 
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 
@@ -41,7 +41,7 @@ router.put('/:faceListId', async (req, res) => {
   const response = await createFaceList(name, description, faceListId, azureId);
 
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 
@@ -59,7 +59,7 @@ router.delete('/:faceListId', async (req, res) => {
   const response = await deleteFaceList(faceListId, azureId);
 
   if (response.error) {
-    return res.status(response.status).send(response.message);
+    return res.status(response.status).send(response);
   }
 
   res.json(response);
@@ -73,7 +73,7 @@ router.delete('/:faceListId/:persistedFaceId', async (req, res) => {
 
   if (response.error) {
     res.status(response.status);
-    res.send(response.message);
+    res.send(response);
     return;
   }
 
@@ -88,7 +88,7 @@ router.get('/:faceListId', async (req, res) => {
   const response = await getFaceList(faceListId, azureId);
 
   if (response.error) {
-    return res.status(response.status).send(response.message);
+    return res.status(response.status).send(response);
   }
 
   res.json(response);
@@ -101,7 +101,7 @@ router.get('/', async (req, res) => {
   const response = await getFaceLists(azureId);
 
   if (response.error) {
-    return res.status(response.status).send(response.message);
+    return res.status(response.status).send(response);
   }
 
   res.json(response);
@@ -119,7 +119,7 @@ router.patch('/:faceListId', async (req, res) => {
 
   const response = await updateFaceList(faceListId, name, userData, azureId);
   if (response.error) {
-    res.status(response.status).json(response.message);
+    res.status(response.status).json(response);
     return;
   }
 

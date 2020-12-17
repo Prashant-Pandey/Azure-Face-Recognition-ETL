@@ -1,11 +1,91 @@
 const connectAPI = require("./api.service");
+const largeFaceListService = require("./face.list.large.service")
+const faceListService = require("./face.list.service")
+
+async function getSimilarFaces(imageUrl, faceId, faceListId, largeFaceListId, faceIds, maxFaceLimit, mode, azureId) {
+  if (!imageUrl) {
+    // then no image uploaded
+    if (!faceId || (!largeFaceListId && !faceListId && !faceIds)) {
+      return {
+        error: true,
+        status: 400,
+        message: 'Please either send face id and (large face list id or face list id or face ids array) or upload the image.'
+      }
+    }
+
+    return await fetchSimilarFaces(faceId, largeFaceListId, maxFaceLimit, mode, azureId);
+  } else {
+    if (!imageUrl) {
+      return {
+        error: true,
+        status: 400,
+        message: 'Please either send face id and large face list id or upload the image.'
+      }
+    }
+
+    // detect face and get the faceid only
+    const faceId = getFaceIdOnly(imageUrl, azureId);
+    const lstIDs = [];
+    // check for all largest faceIds
+    const largeFaceLists = await largeFaceListService.getFaceLists();
+    largeFaceLists.forEach(async (largeFaceList) => {
+      const listId = largeFaceList.faceListId;
+      // check for this
+      const matchRes = await fetchSimilarFaces(faceId, listId, "largeFaceListId", maxFaceLimit, mode, azureId);
+      if (matchRes.length>0&&!matchRes.error) {
+        lstIDs.push(matchRes);
+      }
+    });
+
+    // check for face lists
+    const faceLists = await faceListService.getFaceLists();
+    faceLists.forEach(async (largeFaceList) => {
+      const listId = largeFaceList.faceListId;
+      // check for this
+      const matchRes = await fetchSimilarFaces(faceId, listId, "faceListId", maxFaceLimit, mode, azureId);
+      if (matchRes.length>0&&!matchRes.error) {
+        lstIDs.push(matchRes);
+      }
+    });
+
+    return lstIDs;
+  }
+
+}
+
+// get similar faces from api, only contains fetching data from api
+async function fetchSimilarFaces(faceId, matchId, matchIdType, maxFaceLimit, mode, azureId) {
+  const body = {
+    faceId,
+  }
+
+  if (maxFaceLimit) {
+    body["maxNumOfCandidatesReturned"] = maxFaceLimit;
+
+  }
+
+  if (mode) {
+    body.mode = mode;
+  }
+
+  if (matchIdType === "largeFaceListId") {
+    body.largeFaceListId = matchId;
+  }
+  if (matchIdType === "faceListId") {
+    body.faceListId = matchId;
+  }
+  if (matchIdType === "faceIds") {
+    body.faceIds = matchId;
+  }
+  return await connectAPI('findsimilars', {}, body, azureId, 'post');
+}
 
 async function getFaceIdOfExistingFaces() {
 
 }
 
-async function getFaceIdOfNewFaces(imageUrl) {
-
+async function getFaceIdOnly(imageUrl, azureId) {
+  return await faceDetectionAPI(imageUrl, azureId, false, true, false, false, false);
 }
 
 async function generateReturnFaceAttribute(features = false, noises = false, emotions = false, characterstics = false) {
@@ -77,7 +157,7 @@ async function getFaceDetection(imageUrl, azureId) {
 
 module.exports = {
   getFaceIdOfExistingFaces,
-  getFaceIdOfNewFaces,
   getFaceDetection,
-  getLimitedFaceDetection
+  getLimitedFaceDetection,
+  getSimilarFaces
 }
