@@ -1,26 +1,23 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
-const connectAPI = require("../service/api.service");
+const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
+const {
+  addFace, createFaceList, 
+  deleteFaceList, deleteFaceFromFaceList,
+  getFaceLists, getFaceList, updateFaceList
+} = require("../service/face.list.service");
 
-router.post('/', upload.single('img'), async (req, res) => {
-  const { faceListId, userData, targetFace, azureId } = req.body;
-  const fileName = req.imgFileName;
-  const imageUrl = 'https://i.pinimg.com/originals/27/27/44/27274483c7861355374b32330fcad289.jpg';
-  const params = {
-    userData,
-    targetFace,
-    detectionModel: "detection_01",
-    returnFaceAttributes: 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise',
-    returnFaceLandmarks: true,
-    recognitionModel: 'recognition_03',
-    returnRecognitionModel: true,
-  }
+// add a face to facelist
+router.post('/:faceListId/face', upload.single('img'), uploadToAzure, async (req, res) => {
 
-  const body = {
-    url: imageUrl
-  }
+  const { userData, targetFace, azureId } = req.body;
 
-  const response = await connectAPI(`facelists/${faceListId}/persistedFaces`, params, body, azureId, 'post');
+  const { faceListId } = req.params;
+  
+  const imageUrl = req.imgFileURL;
+
+  const response = await addFace(faceListId, userData, targetFace, imageUrl, azureId)
+
   if (response.error) {
     res.status(response.status).json(response.message);
     return;
@@ -29,28 +26,51 @@ router.post('/', upload.single('img'), async (req, res) => {
   res.json(response)
 });
 
-router.put('/', async (req, res) => {
+// create facelist
+router.put('/:faceListId', async (req, res) => {
   const {
-    faceListId,
-    azureId
+    azureId,
+    name,
+    description
   } = req.body;
 
-  const response = await connectAPI(`facelists/${faceListId}`, {}, {}, azureId, 'put');
+  const {
+    faceListId
+  } = req.params;
+
+  const response = await createFaceList(name, description, faceListId, azureId);
+
   if (response.error) {
     res.status(response.status).json(response.message);
     return;
   }
 
-  res.json(response)
+  res.json({
+    success: true
+  })
 });
 
+// delete facelist
 router.delete('/:faceListId', async (req, res) => {
-  console.log(req.body);
+
   const { azureId } = req.body;
-  const {faceListId} = req.params;
+  const { faceListId } = req.params;
 
-  const response = await connectAPI(`facelists/${faceListId}`, {}, {}, azureId, 'delete');
-  console.log(response.error);
+  const response = await deleteFaceList(faceListId, azureId);
+
+  if (response.error) {
+    return res.status(response.status).send(response.message);
+  }
+
+  res.json(response);
+});
+
+// delete face inside face list
+router.delete('/:faceListId/:persistedFaceId', async (req, res) => {
+  const { faceListId, persistedFaceId } = req.params;
+  const { azureId } = req.body;
+  const response = await deleteFaceFromFaceList(faceListId, persistedFaceId, azureId);
+
   if (response.error) {
     res.status(response.status);
     res.send(response.message);
@@ -60,66 +80,44 @@ router.delete('/:faceListId', async (req, res) => {
   res.json(response);
 });
 
-router.delete('/face', async (req, res) => {
-  const { faceListId, persistedFaceId, azureId } = req.body;
-  const response = await connectAPI(`facelists/${faceListId}/persistedFaces/${persistedFaceId}`, {}, {}, azureId, 'delete');
-
-  if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
-  }
-
-  res.json(response);
-});
-
+// get facelist data
 router.get('/:faceListId', async (req, res) => {
   const { faceListId } = req.params;
   const { azureId } = req.body;
-  const params = {
-    returnRecognitionModel: true
-  }
-  const response = await connectAPI(`facelists/${faceListId}`, params, {}, azureId, 'get');
+ 
+  const response = await getFaceList(faceListId, azureId);
 
   if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
+    return res.status(response.status).send(response.message);
   }
 
   res.json(response);
 });
 
+// get face lists data
 router.get('/', async (req, res) => {
   const { azureId } = req.body;
-  const params = {
-    returnRecognitionModel: true
-  }
-  const response = await connectAPI(`facelists`, params, {}, azureId, 'get');
+
+  const response = await getFaceLists(azureId);
 
   if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
+    return res.status(response.status).send(response.message);
   }
 
   res.json(response);
 });
 
-router.patch('/', async (req, res) => {
+// update facelist
+router.patch('/:faceListId', async (req, res) => {
   const {
-    faceListId,
     name,
-    userData, 
+    userData,
     azureId
   } = req.body;
 
-  const body = {
-    name,
-    userData
-  }
+  const {faceListId} = req.params;
 
-  const response = await connectAPI(`facelists/${faceListId}`, {}, body, azureId, 'patch');
+  const response = await updateFaceList(faceListId, name, userData, azureId);
   if (response.error) {
     res.status(response.status).json(response.message);
     return;

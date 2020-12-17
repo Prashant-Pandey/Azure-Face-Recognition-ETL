@@ -6,12 +6,16 @@ var app = express();
 const faceAPI = require("./routes/face.api");
 const faceListAPI = require("./routes/facelist.api");
 const faceListLargeAPI = require("./routes/facelist.large.api");
+const personListLargeAPI = require("./routes/persongroup.large.api");
+const personLargeAPI = require("./routes/persongroup.large.person.api")
 
 app.use('/uploads', express.static('./uploads/'));
 app.use(express.json())
 app.use('/face', faceAPI);
 app.use('/facelist', faceListAPI);
-app.use('/facelistlarge', faceListLargeAPI);
+app.use('/largefacelist', faceListLargeAPI);
+app.use('/largepersonlist', personListLargeAPI);
+app.use('/largeperson', personLargeAPI);
 
 // const swaggerOptions = {
 //     swaggerDefinition: {

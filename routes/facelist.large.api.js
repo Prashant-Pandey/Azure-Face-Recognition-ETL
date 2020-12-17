@@ -1,78 +1,87 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const connectAPI = require("../service/api.service");
+const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
+const {
+  addFace,
+  createFaceList,
+  deleteFaceList,
+  deleteFaceFromFaceList,
+  getFaceLists,
+  getFaceList,
+  updateFaceList,
+  getFaceListFace,
+  trainFaceList
+} = require("../service/face.list.large.service");
 
-router.post('/', upload.single('img'), async (req, res) => {
-  const { largeFaceListId, userData, targetFace, azureId } = req.body;
-  const fileName = req.imgFileName;
-  const imageUrl = 'https://i.pinimg.com/originals/27/27/44/27274483c7861355374b32330fcad289.jpg';
-  const params = {
-    userData,
-    targetFace,
-    detectionModel: "detection_01",
-    returnFaceAttributes: 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise',
-    returnFaceLandmarks: true,
-    recognitionModel: 'recognition_03',
-    returnRecognitionModel: true,
-  }
+// create large facelist
+router.post('/:largeFaceListId', upload.single('img'), uploadToAzure, async (req, res) => {
 
-  const body = {
-    url: imageUrl
-  }
+  const { userData, targetFace, azureId } = req.body;
 
-  const response = await connectAPI(`largefacelists/${largeFaceListId}/persistedFaces`, params, body, azureId, 'post');
+  const { largeFaceListId } = req.params;
+  
+  const imageUrl = req.imgFileURL;
+
+  const response = await addFace(largeFaceListId, userData, targetFace, imageUrl, azureId)
+
   if (response.error) {
-    res.status(response.status).json(response.message);
-    return;
+    return res.status(response.status).json(response.message);
   }
 
-  res.json(response)
+  return res.json(response);
 });
 
-router.put('/', async (req, res) => {
+
+router.put('/:largeFaceListId', async (req, res) => {
   const {
-    largeFaceListId,
+    name,
+    description,
     azureId
   } = req.body;
 
-  const response = await connectAPI(`largefacelists/${largeFaceListId}`, {}, {}, azureId, 'put');
+  const {
+    largeFaceListId
+  } = req.params;
+
+  const response = await createFaceList(name, description, largeFaceListId, azureId);
+
   if (response.error) {
-    res.status(response.status).json(response.message);
-    return;
+    return res.status(response.status).json(response.message);
   }
 
-  res.json(response)
+  return res.json({
+    success: true
+  });
 });
 
 router.delete('/:largeFaceListId', async (req, res) => {
-  console.log(req.body);
+  
   const { azureId } = req.body;
   const { largeFaceListId } = req.params;
 
-  const response = await connectAPI(`largefacelists/${largeFaceListId}`, {}, {}, azureId, 'delete');
-  console.log(response.error);
-  if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
-  }
-
-  res.json(response);
-});
-
-router.delete('/face', async (req, res) => {
-  const { largeFaceListId, persistedFaceId, azureId } = req.body;
-  const response = await connectAPI(`largefacelists/${largeFaceListId}/persistedFaces/${persistedFaceId}`, {}, {}, azureId, 'delete');
+  const response = await deleteFaceList(largeFaceListId, azureId);
 
   if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
+    return res.status(response.status).send(response.message);
   }
 
-  res.json(response);
+  res.json({success: true});
 });
 
+router.delete('/:largeFaceListId/:persistedFaceId', async (req, res) => {
+  const { largeFaceListId, persistedFaceId } = req.params;
+  const { azureId } = req.body;
+  const response = await deleteFaceFromFaceList(largeFaceListId, persistedFaceId, azureId);
+
+  if (response.error) {
+    return res.status(response.status).send(response.message);
+  }
+
+  return res.json({success: true});
+});
+
+// filter the large face ids
 router.get('/', async (req, res) => {
   const { azureId } = req.body;
   const { start, top } = req.params;
@@ -83,7 +92,7 @@ router.get('/', async (req, res) => {
     returnRecognitionModel: true
   }
 
-  const response = await connectAPI(`largefacelists`, params, {}, azureId, 'get');
+  const response = await getFaceLists(start, top, azureId);
 
   if (response.error) {
     res.status(response.status);
@@ -94,37 +103,25 @@ router.get('/', async (req, res) => {
   res.json(response);
 });
 
+// get facelist data by id
 router.get('/:largeFaceListId', async (req, res) => {
   const { largeFaceListId } = req.params;
   const { azureId } = req.body;
-  const params = {
-    returnRecognitionModel: true
-  }
-  const response = await connectAPI(`largefacelists/${largeFaceListId}`, params, {}, azureId, 'get');
+ 
+  const response = await getFaceList(largeFaceListId, azureId);
 
   if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
+    return res.status(response.status).send(response.message);
   }
 
-  res.json(response);
+  return res.json(response);
 });
 
-router.get('/face/:largeFaceListId', async (req, res) => {
-  const { persistedFaceId, start, end, azureId } = req.body;
+// get facelist face data
+router.get('/:largeFaceListId/face', async (req, res) => {
+  const { start, end, persistedFaceId, azureId } = req.body;
   const { largeFaceListId } = req.params;
-  let response = {}
-  if (persistedFaceId) {
-    response = await connectAPI(`largefacelists/${largeFaceListId}/persistedfaces/${persistedFaceId}`, {}, {}, azureId, 'get');
-  } else {
-    const params = {
-      start,
-      end
-    }
-    response = await connectAPI(`largefacelists/${largeFaceListId}/persistedfaces`, params, {}, azureId, 'get');
-  }
-
+  const response = await getFaceListFace(largeFaceListId, persistedFaceId, start, end, azureId);
 
   if (response.error) {
     res.status(response.status);
@@ -138,8 +135,8 @@ router.get('/face/:largeFaceListId', async (req, res) => {
 router.get('/:largeFaceListId/train', async (req, res) => {
   const { azureId } = req.body;
   const { largeFaceListId } = req.params;
-
-  const response = await connectAPI(`largefacelists/${largeFaceListId}/training`, {}, {}, azureId, 'get');
+  
+  const response = await trainingStatusFaceList(largeFaceListId, azureId)
 
   if (response.error) {
     res.status(response.status);
@@ -153,8 +150,7 @@ router.get('/:largeFaceListId/train', async (req, res) => {
 router.post('/:largeFaceListId/train', async (req, res) => {
   const { azureId } = req.body;
   const { largeFaceListId } = req.params;
-
-  const response = await connectAPI(`largefacelists/${largeFaceListId}/train`, {}, {}, azureId, 'patch');
+  const response = await trainFaceList(largeFaceListId, azureId);
 
   if (response.error) {
     res.status(response.status);

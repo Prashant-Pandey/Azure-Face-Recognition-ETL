@@ -1,7 +1,10 @@
 const multer = require('multer');
+const staticStorage = process.env.STATIC_FOLDER || "./uploads/";
+
+// store the file data to the static folder
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, './uploads/');
+    cb(null, staticStorage);
   },
   filename: (req, file, cb) => {
     const imgName = Date.now() + file.originalname;
@@ -10,6 +13,7 @@ const storage = multer.diskStorage({
   }
 });
 
+// filter the files to be uploaded
 const fileFiler = (req, file, cb) => {
   // if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/png' || file.mimetype === 'image/gif' || file.mimetype === 'image/bmp') {
   //     cb(null, true);

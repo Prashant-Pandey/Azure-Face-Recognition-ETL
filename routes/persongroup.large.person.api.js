@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const connectAPI = require("../service/api.service");
+const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
 
 router.post('/', async (req, res) => {
   const { azureId, name, userData, largePersonGroupId } = req.body;
@@ -21,15 +22,15 @@ router.post('/', async (req, res) => {
   res.json(response);
 });
 
-router.post('/:personId', upload.single('img'), async (req, res) => {
+router.post('/:personId', upload.single('img'), uploadToAzure, async (req, res) => {
   const {
     azureId,
     userData,
     targetFace,
     largePersonGroupId
   } = req.body;
-  const fileName = req.imgFileName;
-  const imageUrl = 'https://i.pinimg.com/originals/27/27/44/27274483c7861355374b32330fcad289.jpg';
+  
+  const imageUrl = req.imgFileURL;
   const { personId } = req.params;
   const params = {
     userData: userData,

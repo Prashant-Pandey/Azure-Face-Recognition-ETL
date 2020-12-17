@@ -1,57 +1,66 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
+const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
 const connectAPI = require("../service/api.service");
+const { getFaceDetection, getLimitedFaceDetection } = require("../service/face.service")
 
-router.post('/', upload.single('img'), async (req, res) => {
-  const fileName = req.imgFileName;
-  const imageUrl = 'https://i.pinimg.com/originals/27/27/44/27274483c7861355374b32330fcad289.jpg';
-  const { azureId } = req.body;
-  const params = {
-    detectionModel: 'detection_01',
-    returnFaceAttributes: 'age,gender,headPose,smile,facialHair,glasses,emotion,hair,makeup,occlusion,accessories,blur,exposure,noise',
-    returnFaceId: true,
-    returnFaceLandmarks: true,
-    recognitionModel: 'recognition_03',
-    returnRecognitionModel: true,
+router.post('/', upload.single('img'), uploadToAzure, async (req, res) => {
+  try {
+    // check input 
+    const { location, features, landmark, emotions, characterstics, noises } = req.body;
+    // create params for the azure face api
+    const imageUrl = req.imgFileURL;
+    const { azureId } = req.body;
+
+    if (!location && !features && !landmark && !emotions && !characterstics && !noises) {
+      return res.json(await getFaceDetection(imageUrl, azureId));
+    }
+
+    return res.json(await getLimitedFaceDetection(imageUrl, azureId, location, landmark, features, noises, emotions, characterstics));
+
+  } catch (error) {
+
+    if (error.code === 'ENOENT') {
+      return res.status(500).json({ error: error.message });
+    }
+
+    if (!error.status) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    return res.status(error.status).json(error.message);
   }
-
-  const body = {
-    url: imageUrl,
-  }
-
-  const response = await connectAPI('detect', params, body, azureId, 'post');
-  if (response.error) {
-    res.status(response.status).json(response.message);
-    return;
-  }
-
-  res.json(response)
 });
 
-router.post('/similar', async (req, res) => {
-  const {
-    faceId,
-    largeFaceListId,
-    maxFaceLimit,
-    mode,
-    azureId
-  } = req.body;
+router.post(
+  '/similar',
+  upload.single('img'),
+  uploadToAzure, async (req, res) => {
+    const {
+      // faceId,
+      // largeFaceListId,
+      maxFaceLimit,
+      mode,
+      azureId
+    } = req.body;
 
-  const body = {
-    faceId,
-    largeFaceListId,
-    "maxNumOfCandidatesReturned": maxFaceLimit,
-    mode
+    // const body = {
+    //   faceId,
+    //   largeFaceListId,
+    //   "maxNumOfCandidatesReturned": maxFaceLimit,
+    //   mode
+    // }
+
+    // const response = await connectAPI('findsimilars', {}, body, azureId, 'post');
+    // if (response.error) {
+    //   res.status(response.status).json(response.message);
+    //   return;
+    // }
+
+    // res.json(response)
+    res.json({one:'one'})
   }
-
-  const response = await connectAPI('findsimilars', {}, body, azureId, 'post');
-  if (response.error) {
-    res.status(response.status).json(response.message);
-    return;
-  }
-
-  res.json(response)
-});
+);
 
 router.post('/group', async (req, res) => {
   console.log(req.body);

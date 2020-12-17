@@ -3,7 +3,7 @@ const upload = require("../middlewares/image.middleware");
 const connectAPI = require("../service/api.service");
 
 router.put('/:largePersonGroupId', async (req, res) => {
-  const { azureId, name, userData } = req.body;
+  const { name, userData } = req.body;
   const { largePersonGroupId } = req.params;
 
   const body = {
@@ -11,8 +11,8 @@ router.put('/:largePersonGroupId', async (req, res) => {
     userData,
     recognitionModel: "recognition_03"
   }
-
-  const response = await connectAPI(`largepersongroups/${largePersonGroupId}`, {}, body, azureId, 'put');
+  console.log(azureId);
+  const response = await connectAPI(`largepersongroups/${largePersonGroupId}`, {}, body, null, 'put');
 
   if (response.error) {
     res.status(response.status);

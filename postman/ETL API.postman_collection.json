@@ -1,0 +1,49 @@
+{
+	"info": {
+		"_postman_id": "75d2be73-b086-49dc-afd1-7a254dcd9a9c",
+		"name": "ETL API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Face Detection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"faceId\": \"2ba479b9-102d-4f40-9240-f67ff55e36a8\",\r\n    \"largeFaceListId\": \"\",\r\n    \"maxFaceLimit\": 10,\r\n    \"mode\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/face",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"face"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Similar",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
