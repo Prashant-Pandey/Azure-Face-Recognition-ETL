@@ -9,21 +9,32 @@ const constainerName = process.env.STORAGE_CONTAINER || "azure-etl";
 async function uploadToAzure(req, res, next) {
   try {
     // get the file from server
-    const fileName = req.imgFileName;
-    if (!fileName) {
+    const fileNames = req.imgFileName;
+    if (!fileNames || fileNames.length === 0) {
       return next();
     }
-    const filePath = staticStorage + fileName;
-    const file = await fs.readFileSync(filePath);
-    // upload data to azure
-    const blobServiceClient = BlobServiceClient.fromConnectionString(azureStorageConnectionStr);
-    const containerClient = blobServiceClient.getContainerClient(constainerName);
-    const blockBlobClient = containerClient.getBlockBlobClient(fileName);
-    const uploadBlobResponse = await blockBlobClient.upload(file, file.length);
-    // delete file from our space
-    const deleteFile = await fs.unlinkSync(filePath);
-    // setting up the file blob url
-    req.imgFileURL = blockBlobClient.url;
+    for (let i = 0; i < fileNames.length; i++) {
+      const fileName = fileNames[i];
+      const filePath = staticStorage + fileName;
+      const file = await fs.readFileSync(filePath);
+      // upload data to azure
+      const blobServiceClient = BlobServiceClient.fromConnectionString(azureStorageConnectionStr);
+      const containerClient = blobServiceClient.getContainerClient(constainerName);
+      const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+      const uploadBlobResponse = await blockBlobClient.upload(file, file.length);
+      // delete file from our space
+      const deleteFile = await fs.unlinkSync(filePath);
+      // setting up the file blob url
+      if (!req.imgFileURL) {
+        req.imgFileURL = [blockBlobClient.url]
+      }else{
+        req.imgFileURL = [...req.imgFileURL, blockBlobClient.url]
+      }
+    }
+
+    if (req.imgFileURL.length===1) {
+      req.imgFileURL = req.imgFileURL[0];
+    }
     // going to next method in chain
     next();
   } catch (error) {

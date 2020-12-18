@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
-const { createPersonList, deletePersonList, getPersonList, getPersonListTrainingStatus, getPersonLists, trainPersonList, updatePersonList, createPerson, addPersonFace, deletePerson, deletePersonFace,
+const { createPersonList, deletePersonList, getPersonListMetaData,
+  getPersonListFaces, getPersonListTrainingStatus, getPersonLists, trainPersonList, updatePersonList, createPerson, addPersonFace, deletePerson, deletePersonFace,
   getPersonDetails, getPersonFaceDetails, updatePerson,
-  updatePersonFace } = require("../service/person.list.service");
+  updatePersonFace, trainAllPersonList } = require("../service/person.list.service");
 
 router.post('/:personGroupId/train', async (req, res) => {
   const {
@@ -20,6 +21,22 @@ router.post('/:personGroupId/train', async (req, res) => {
 
   res.json({ success: true })
 });
+
+router.post('/train', async (req, res) => {
+  const {
+    azureId
+  } = req.body;
+
+
+  const response = await trainAllPersonList(azureId);
+
+  if (response.length > 0) {
+    res.status(400).json(response);
+    return;
+  }
+
+  return res.json({ success: true });
+})
 // create person
 router.post('/:personGroupId/person', async (req, res) => {
   const { name, userData, azureId } = req.body;
@@ -95,7 +112,8 @@ router.delete('/:personGroupId', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const { azureId, start, top } = req.body;
+  const { start, top } = req.params;
+  const { azureId } = req.body;
 
   const response = await getPersonLists(start, top, azureId);
 
@@ -112,7 +130,7 @@ router.get('/:personGroupId', async (req, res) => {
   const { azureId } = req.body;
   const { personGroupId, start, top } = req.params
 
-  const response = await getPersonList(personGroupId, start, top, azureId);
+  const response = await getPersonListMetaData(personGroupId, start, top, azureId);
 
   if (response.error) {
     res.status(response.status);
@@ -127,6 +145,20 @@ router.get('/:personGroupId/train', async (req, res) => {
   const { azureId } = req.body;
   const { personGroupId } = req.params
   const response = await getPersonListTrainingStatus(personGroupId, azureId);
+
+  if (response.error) {
+    res.status(response.status);
+    res.send(response);
+    return;
+  }
+
+  res.json(response);
+});
+
+router.get('/:personGroupId/faces', async (req, res) => {
+  const { azureId } = req.body;
+  const { personGroupId, start, top } = req.params
+  const response = await getPersonListFaces(personGroupId, start, top, azureId);
 
   if (response.error) {
     res.status(response.status);

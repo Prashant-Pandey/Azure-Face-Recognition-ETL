@@ -2,7 +2,11 @@ const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
 const connectAPI = require("../service/api.service");
-const { getFaceDetection, getLimitedFaceDetection, getSimilarFaces } = require("../service/face.service")
+const {
+  getFaceDetection, getLimitedFaceDetection,
+  getSimilarFaces, createMessyGroup,
+  indentify, verify
+} = require("../service/face.service")
 
 router.post('/', upload.single('img'), uploadToAzure, async (req, res) => {
   try {
@@ -32,9 +36,8 @@ router.post('/', upload.single('img'), uploadToAzure, async (req, res) => {
   }
 });
 
-router.post(
-  '/similar',
-  upload.single('img'),
+router.post( '/similar',
+  upload.any('img'),
   uploadToAzure,
   async (req, res) => {
     const {
@@ -60,25 +63,21 @@ router.post(
 );
 
 router.post('/group', async (req, res) => {
-  console.log(req.body);
+
   const { faceIds, azureId } = req.body;
 
-  const body = { faceIds };
-
-  const response = await connectAPI('group', {}, body, azureId, 'post');
+  const response = await createMessyGroup(faceIds, azureId);
 
   if (response.error) {
-    res.status(response.status).send(response);
-    return;
+    return res.status(response.status).send(response);
   }
 
-  res.json(response);
+  return res.json(response);
 });
 
 router.post('/identify', async (req, res) => {
   const { largePersonGroupId, faceIds, maxFaceLimit, confidenceThreshold, azureId } = req.body;
-  const body = { largePersonGroupId, faceIds, maxNumOfCandidatesReturned: maxFaceLimit, confidenceThreshold }
-  const response = await connectAPI('identify', {}, body, azureId, 'post');
+  const response = await indentify(largePersonGroupId, faceIds, maxFaceLimit, confidenceThreshold, azureId);
 
   if (response.error) {
     res.status(response.status);
@@ -89,24 +88,16 @@ router.post('/identify', async (req, res) => {
   res.json(response);
 });
 
-router.post('/verify', async (req, res) => {
+router.post('/verify', upload.any('img'), uploadToAzure, async (req, res) => {
   const { faceId, personId, largePersonGroupId, azureId, faceId1, faceId2 } = req.body;
-  let body = {}
-  if (faceId1 && faceId2) {
-    body = {
-      faceId1,
-      faceId2
-    }
-  } else {
-    body = {
-      largePersonGroupId,
-      faceIds,
-      "maxNumOfCandidatesReturned": maxFaceLimit,
-      confidenceThreshold
-    }
-  }
+  const [face1Url, face2Url] = req.imgFileURL;
 
-  const response = await connectAPI('verify', {}, body, azureId, 'post');
+  const response = await verify(
+    faceId, personId, largePersonGroupId,
+    faceId1, faceId2, 
+    face1Url, face2Url, 
+    azureId
+  );
 
   if (response.error) {
     res.status(response.status);

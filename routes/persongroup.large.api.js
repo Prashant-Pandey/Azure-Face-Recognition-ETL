@@ -109,7 +109,8 @@ router.get('/:largePersonGroupId', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const { azureId, start, top } = req.body;
+  const {start, top} = req.params;
+  const { azureId } = req.body;
   
   const response = await getPersonLists(start, top, azureId);
 

@@ -64,18 +64,28 @@ async function deleteFaceFromFaceList(faceListId, persistedFaceId, azureId) {
   return await connectAPI(`facelists/${faceListId}/persistedFaces/${persistedFaceId}`, {}, {}, azureId, 'delete');
 }
 
-async function getPersonList(personGroupId, start, top, azureId) {
+async function getPersonListMetaData(personGroupId, azureId) {
   const params = {
     returnRecognitionModel: true
   }
+
+  return await connectAPI(`persongroups/${personGroupId}`, {}, {}, azureId, 'get');
+}
+
+async function getPersonListFaces(personGroupId, start, top, azureId){
+  const params = {
+    returnRecognitionModel: true
+  }
+
   if (start) {
     params.start = start;
   }
 
-  if(top){
+  if (top) {
     params.top = top;
   }
-  return await connectAPI(`persongroups/${personGroupId}`, params, {}, azureId, 'get');
+
+  return await connectAPI(`persongroups/${personGroupId}/persons`, params, {}, azureId, 'get');
 }
 
 async function getPersonLists(start, top, azureId) {
@@ -95,6 +105,22 @@ async function getPersonLists(start, top, azureId) {
 
 async function trainPersonList(personGroupId, azureId) {
   return await connectAPI(`persongroups/${personGroupId}/train`, {}, {}, azureId, 'post');
+}
+
+async function trainAllPersonList(azureId) {
+  const personLists = await getPersonLists();
+  let trainResponseError = [];
+  for (let i = 0; i < personLists.length; i++) {
+    const personListRes = await connectAPI(`persongroups/${personLists[i].personGroupId}/train`, {}, {}, azureId, 'post');
+    if (personListRes.error) {
+      trainResponseError.push({
+        personGroupId: personLists[i].personGroupId,
+        error: personListRes
+      })
+    }
+  }
+
+  return trainResponseError;
 }
 
 async function updatePersonList(personGroupId, name = '', userData = '', azureId) {
@@ -131,7 +157,8 @@ module.exports = {
   deletePersonList,
   deleteFaceFromFaceList,
   getPersonLists,
-  getPersonList,
+  getPersonListMetaData,
+  getPersonListFaces,
   getPersonListTrainingStatus,
   trainPersonList,
   updatePersonList,
@@ -142,5 +169,6 @@ module.exports = {
   getPersonDetails,
   getPersonFaceDetails,
   updatePerson,
-  updatePersonFace
+  updatePersonFace,
+  trainAllPersonList
 }

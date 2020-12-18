@@ -2,19 +2,36 @@ const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
 const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
 const {
-  addFace, createFaceList, 
+  addFace, createFaceList,
   deleteFaceList, deleteFaceFromFaceList,
-  getFaceLists, getFaceList, updateFaceList,
-  trainingStatusFaceList, trainFaceList, getFaceListFace
+  getFaceLists, getFaceListFaceData,
+  getFaceListMetaData, updateFaceList,
+  trainingStatusFaceList, trainFaceList, getFaceListFace,
+  trainAllFaceList
 } = require("../service/face.list.large.service");
 
+// train all facelists
+router.post('/train', async (req, res) => {
+
+  const { azureId } = req.body;
+
+  const response = await trainAllFaceList(azureId)
+
+  if (response.length>0) {
+    res.status(400).json(response);
+    return;
+  }
+
+  res.json({ success: true })
+});
+
 // add a face to facelist
-router.post('/:largeFaceListId/face', upload.single('img'), uploadToAzure, async (req, res) => {
+router.post('/:largeFaceListId', upload.single('img'), uploadToAzure, async (req, res) => {
 
   const { userData, targetFace, azureId } = req.body;
 
   const { largeFaceListId } = req.params;
-  
+
   const imageUrl = req.imgFileURL;
 
   const response = await addFace(largeFaceListId, userData, targetFace, imageUrl, azureId)
@@ -31,6 +48,7 @@ router.post('/:largeFaceListId/face', upload.single('img'), uploadToAzure, async
 router.post('/:largeFaceListId/train', async (req, res) => {
 
   const { largeFaceListId } = req.params;
+  const { azureId } = req.body;
 
   const response = await trainFaceList(largeFaceListId, azureId)
 
@@ -39,7 +57,7 @@ router.post('/:largeFaceListId/train', async (req, res) => {
     return;
   }
 
-  res.json({success: true})
+  res.json({ success: true })
 });
 
 // create facelist
@@ -109,10 +127,22 @@ router.get('/:largeFaceListId/train', async (req, res) => {
   res.json(response);
 });
 
+router.get('/:largeFaceListId/faces', async (req, res) => {
+  const { largeFaceListId, start, top } = req.params;
+  const { azureId } = req.body;
+  const response = await getFaceListFaceData(largeFaceListId, start, top, azureId);
+
+  if (response.error) {
+    return res.status(response.status).send(response);
+  }
+
+  res.json(response);
+});
+
 // get face data
 router.get('/:largeFaceListId/:persistedFaceId', async (req, res) => {
   const { azureId } = req.body;
-  const {largeFaceListId, persistedFaceId} = req.params;
+  const { largeFaceListId, persistedFaceId } = req.params;
 
   const response = await getFaceListFace(largeFaceListId, persistedFaceId, azureId);
 
@@ -125,10 +155,9 @@ router.get('/:largeFaceListId/:persistedFaceId', async (req, res) => {
 
 // get facelist data
 router.get('/:largeFaceListId', async (req, res) => {
-  const { largeFaceListId } = req.params;
-  const { start, top, azureId } = req.body;
- 
-  const response = await getFaceList(largeFaceListId, start, top, azureId);
+  const { largeFaceListId, start, top } = req.params;
+  const { azureId } = req.body;
+  const response = await getFaceListMetaData(largeFaceListId, start, top, azureId);
 
   if (response.error) {
     return res.status(response.status).send(response);
@@ -139,7 +168,8 @@ router.get('/:largeFaceListId', async (req, res) => {
 
 // get face lists data
 router.get('/', async (req, res) => {
-  const { start, top, azureId } = req.body;
+  const { azureId } = req.body;
+  const { start, top } = req.params;
 
   const response = await getFaceLists(start, top, azureId);
 
@@ -158,7 +188,7 @@ router.patch('/:largeFaceListId', async (req, res) => {
     azureId
   } = req.body;
 
-  const {largeFaceListId} = req.params;
+  const { largeFaceListId } = req.params;
 
   const response = await updateFaceList(largeFaceListId, name, userData, azureId);
   if (response.error) {

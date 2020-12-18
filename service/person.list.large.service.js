@@ -67,12 +67,10 @@ async function createPersonList(name, userData, largePersonGroupId, azureId) {
 
   return await connectAPI(`largepersongroups/${largePersonGroupId}`, {}, body, azureId, 'put');
 }
-
 // delete large person list
 async function deletePersonList(largePersonGroupId, azureId) {
   return await connectAPI(`largepersongroups/${largePersonGroupId}`, {}, {}, azureId, 'delete');
 }
-
 // get only one large person list
 async function getPersonList(largePersonGroupId, azureId) {
   const params = {

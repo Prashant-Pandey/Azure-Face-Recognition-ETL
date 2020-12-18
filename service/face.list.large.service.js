@@ -35,19 +35,28 @@ async function deleteFaceFromFaceList(faceListId, persistedFaceId, azureId) {
   return await connectAPI(`largefacelists/${faceListId}/persistedFaces/${persistedFaceId}`, {}, {}, azureId, 'delete');
 }
 
-async function getFaceList(faceListId, start = '', top = 0, azureId) {
+async function getFaceListMetaData(faceListId, azureId) {
   const params = {
     returnRecognitionModel: true
   }
-  if (start !== '') {
-    params["start"] = start;
+
+  return await connectAPI(`largefacelists/${faceListId}`, params, {}, azureId, 'get')
+}
+
+async function getFaceListFaceData(faceListId, start, top, azureId) {
+  const params = {
+    returnRecognitionModel: true
   }
 
-  if (top !== 0) {
+  if (start) {
+    params['start'] = start;
+  }
+
+  if(top){
     params["top"] = top;
   }
-  
-  return await connectAPI(`largefacelists/${faceListId}`, params, {}, azureId, 'get')
+
+  return await connectAPI(`largefacelists/${faceListId}/persistedfaces`, params, {}, azureId, 'get')
 }
 
 async function getFaceLists(start = '', top = 0, azureId) {
@@ -88,10 +97,32 @@ async function getFaceListFace(largeFaceListId, persistedFaceId, azureId) {
 
 async function trainFaceList(largeFaceListId, azureId) {
   return await connectAPI(
-    `largefacelists/${largeFaceListId}/training`,
+    `largefacelists/${largeFaceListId}/train`,
     {}, {}, azureId,
     'post'
   );
+}
+
+async function trainAllFaceList(azureId) {
+  const largeFaceList = await getFaceLists();
+  let trainResponseError = [];
+  
+  for (let i = 0; i < largeFaceList.length; i++) {
+    const largeFaceListRes = await connectAPI(
+      `largefacelists/${largeFaceList[i].largeFaceListId}/train`,
+      {}, {},
+      azureId,
+      'post'
+    );
+    if (largeFaceListRes.error) {
+      trainResponseError.push({
+        personGroupId: largeFaceList[i].largePersonGroupId,
+        error: largeFaceListRes
+      })
+    }
+  }
+
+  return trainResponseError;
 }
 
 async function trainingStatusFaceList(largeFaceListId, azureId) {
@@ -108,9 +139,11 @@ module.exports = {
   deleteFaceList,
   deleteFaceFromFaceList,
   getFaceLists,
-  getFaceList,
+  getFaceListFaceData,
+  getFaceListMetaData,
   updateFaceList,
   getFaceListFace,
   trainFaceList,
-  trainingStatusFaceList
+  trainingStatusFaceList,
+  trainAllFaceList
 }

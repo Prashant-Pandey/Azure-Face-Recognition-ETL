@@ -8,7 +8,11 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const imgName = Date.now() + file.originalname;
-    req.imgFileName = imgName;
+    if (!req.imgFileName) {
+      req.imgFileName = [imgName]
+    }else{
+      req.imgFileName = [...req.imgFileName, imgName]
+    }
     cb(null, imgName);
   }
 });

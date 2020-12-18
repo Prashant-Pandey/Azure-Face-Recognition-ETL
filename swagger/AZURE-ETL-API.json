@@ -1,0 +1,867 @@
+{
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "url": "http://localhost:4000/",
+      "description": "ETL API for Azure Face API",
+      "variables": {}
+    }
+  ],
+  "info": {
+    "version": "0.0.1",
+    "title": "AZURE FACE ETL API",
+    "description": "",
+    "termsOfService": "",
+    "contact": {
+      "name": "Prashant Pandey"
+    },
+    "license": {
+      "name": ""
+    }
+  },
+  "paths": {
+    "/v1/face": {
+      "post": {
+        "summary": "Get attributes and features of the uploaded face",
+        "operationId": "FaceDetection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type":"array",
+                  "example": [
+                    {
+                      "faceId": "a261eba4-3d81-40b9-80de-863513b2cffd",
+                      "faceRectangle": {
+                        "top": 72,
+                        "left": 261,
+                        "width": 130,
+                        "height": 130
+                      },
+                      "faceLandmarks": {
+                        "pupilLeft": {
+                          "x": 299.5,
+                          "y": 107.1
+                        },
+                        "pupilRight": {
+                          "x": 352.5,
+                          "y": 106.2
+                        },
+                        "noseTip": {
+                          "x": 314.1,
+                          "y": 143.3
+                        },
+                        "mouthLeft": {
+                          "x": 306.9,
+                          "y": 169
+                        },
+                        "mouthRight": {
+                          "x": 359.3,
+                          "y": 168.2
+                        },
+                        "eyebrowLeftOuter": {
+                          "x": 283,
+                          "y": 93.7
+                        },
+                        "eyebrowLeftInner": {
+                          "x": 313.5,
+                          "y": 96.1
+                        },
+                        "eyeLeftOuter": {
+                          "x": 293.4,
+                          "y": 108.4
+                        },
+                        "eyeLeftTop": {
+                          "x": 302.9,
+                          "y": 103.3
+                        },
+                        "eyeLeftBottom": {
+                          "x": 302.7,
+                          "y": 111
+                        },
+                        "eyeLeftInner": {
+                          "x": 311.5,
+                          "y": 108.2
+                        },
+                        "eyebrowRightInner": {
+                          "x": 335.9,
+                          "y": 93.6
+                        },
+                        "eyebrowRightOuter": {
+                          "x": 380.4,
+                          "y": 98.1
+                        },
+                        "eyeRightInner": {
+                          "x": 346.6,
+                          "y": 108
+                        },
+                        "eyeRightTop": {
+                          "x": 357.6,
+                          "y": 102.1
+                        },
+                        "eyeRightBottom": {
+                          "x": 356.5,
+                          "y": 110.8
+                        },
+                        "eyeRightOuter": {
+                          "x": 366.3,
+                          "y": 108.7
+                        },
+                        "noseRootLeft": {
+                          "x": 316.6,
+                          "y": 108.8
+                        },
+                        "noseRootRight": {
+                          "x": 335.9,
+                          "y": 109.4
+                        },
+                        "noseLeftAlarTop": {
+                          "x": 309.4,
+                          "y": 130
+                        },
+                        "noseRightAlarTop": {
+                          "x": 336.3,
+                          "y": 132
+                        },
+                        "noseLeftAlarOutTip": {
+                          "x": 301.8,
+                          "y": 140.6
+                        },
+                        "noseRightAlarOutTip": {
+                          "x": 343.2,
+                          "y": 141.8
+                        },
+                        "upperLipTop": {
+                          "x": 322.7,
+                          "y": 162.2
+                        },
+                        "upperLipBottom": {
+                          "x": 323.3,
+                          "y": 167.2
+                        },
+                        "underLipTop": {
+                          "x": 324,
+                          "y": 180.9
+                        },
+                        "underLipBottom": {
+                          "x": 324.9,
+                          "y": 188.5
+                        }
+                      },
+                      "faceAttributes": {
+                        "smile": 1,
+                        "headPose": {
+                          "pitch": -0.2,
+                          "roll": -1.6,
+                          "yaw": -26.3
+                        },
+                        "gender": "male",
+                        "age": 25,
+                        "facialHair": {
+                          "moustache": 0.1,
+                          "beard": 0.1,
+                          "sideburns": 0.1
+                        },
+                        "glasses": "NoGlasses",
+                        "emotion": {
+                          "anger": 0,
+                          "contempt": 0,
+                          "disgust": 0,
+                          "fear": 0,
+                          "happiness": 1,
+                          "neutral": 0,
+                          "sadness": 0,
+                          "surprise": 0
+                        },
+                        "blur": {
+                          "blurLevel": "low",
+                          "value": 0.15
+                        },
+                        "exposure": {
+                          "exposureLevel": "goodExposure",
+                          "value": 0.73
+                        },
+                        "noise": {
+                          "noiseLevel": "low",
+                          "value": 0
+                        },
+                        "makeup": {
+                          "eyeMakeup": false,
+                          "lipMakeup": false
+                        },
+                        "accessories": [],
+                        "occlusion": {
+                          "foreheadOccluded": false,
+                          "eyeOccluded": false,
+                          "mouthOccluded": false
+                        },
+                        "hair": {
+                          "bald": 0.16,
+                          "invisible": false,
+                          "hairColor": [
+                            {
+                              "color": "black",
+                              "confidence": 0.96
+                            },
+                            {
+                              "color": "brown",
+                              "confidence": 0.91
+                            },
+                            {
+                              "color": "blond",
+                              "confidence": 0.4
+                            },
+                            {
+                              "color": "gray",
+                              "confidence": 0.34
+                            },
+                            {
+                              "color": "other",
+                              "confidence": 0.2
+                            },
+                            {
+                              "color": "red",
+                              "confidence": 0.05
+                            },
+                            {
+                              "color": "white",
+                              "confidence": 0
+                            }
+                          ]
+                        }
+                      },
+                      "recognitionModel": "recognition_03"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "img"
+                ],
+                "properties": {
+                  "img": {
+                    "type": "file",
+                    "format": "image/jpg"
+                  },
+                  "location": {}
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_1.jpg"
+                },
+                {
+                  "key": "location",
+                  "value": "true",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/v1/face/similar/": {
+      "post": {
+        "summary": "Find Similar",
+        "operationId": "FindSimilar",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": {
+                  "faceId": "",
+                  "largeFaceListId": "",
+                  "maxFaceLimit": 10,
+                  "mode": ""
+                }
+              },
+              "example": "{\r\n    \"faceId\": \"\",\r\n    \"largeFaceListId\": \"\",\r\n    \"maxFaceLimit\": 10,\r\n    \"mode\": \"\"\r\n}"
+            }
+          }
+        }
+      }
+    },
+    "/v1/facelist": {
+      "get": {
+        "summary": "FaceList get all",
+        "operationId": "FaceListgetall",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/facelist/pizza-gate-faces": {
+      "put": {
+        "summary": "FaceList create",
+        "operationId": "FaceListcreate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": {
+                  "name": "pizza-faces-data",
+                  "description": "faces i see in pizza"
+                }
+              },
+              "example": "{\r\n    \"name\":\"pizza-faces-data\",\r\n    \"description\":\"faces i see in pizza\"\r\n}"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "FaceList delete",
+        "operationId": "FaceListdelete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "get": {
+        "summary": "FaceList get face data",
+        "operationId": "FaceListgetfacedata",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/facelist/pizza-gate-faces/face": {
+      "post": {
+        "summary": "FaceList add face",
+        "operationId": "FaceListaddface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "userData"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "userData": {
+                    "type": "string",
+                    "example": "one two three"
+                  }
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_3.jpg"
+                },
+                {
+                  "key": "userData",
+                  "value": "one two three",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/first-large-list1": {
+      "put": {
+        "summary": "LargeFaceList create",
+        "operationId": "LargeFaceListcreate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": {
+                  "name": "first-large-list",
+                  "description": "first-large-list"
+                }
+              },
+              "example": "{\r\n    \"name\": \"first-large-list\",\r\n    \"description\": \"first-large-list\"\r\n}"
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/first-large-list1": {
+      "get": {
+        "summary": "LargeFaceList get facelist data",
+        "operationId": "LargeFaceListgetfacelistdata",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "post": {
+        "summary": "LargeFaceList add face",
+        "operationId": "LargeFaceListaddface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "userData"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "userData": {
+                    "type": "string",
+                    "example": "one two three"
+                  }
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_3.jpg"
+                },
+                {
+                  "key": "userData",
+                  "value": "one two three",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/first-large-list": {
+      "delete": {
+        "summary": "LargeFaceList delete",
+        "operationId": "LargeFaceListdelete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/first-large-list1/31d86ee2-2f42-4ae9-b1d7-6b790332546a": {
+      "delete": {
+        "summary": "LargeFaceList delete face",
+        "operationId": "LargeFaceListdeleteface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/largefacelist": {
+      "get": {
+        "summary": "LargeFaceList get all",
+        "operationId": "LargeFaceListgetall",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/first-large-list1/": {
+      "get": {
+        "summary": "LargeFaceList get one by id",
+        "operationId": "LargeFaceListgetonebyid",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/first-large-list1/train": {
+      "post": {
+        "summary": "LargeFaceListTrain",
+        "operationId": "LargeFaceListTrain",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-2": {
+      "put": {
+        "summary": "PersonList create",
+        "operationId": "PersonListcreate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": {
+                  "name": "large person list",
+                  "userData": "randome user person list"
+                }
+              },
+              "example": "{\r\n    \"name\":\"large person list\",\r\n    \"userData\":\"randome user person list\"\r\n}"
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "PersonList delete",
+        "operationId": "PersonListdelete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1": {
+      "get": {
+        "summary": "PersonList get one by id",
+        "operationId": "PersonListgetonebyid",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1/train": {
+      "get": {
+        "summary": "PersonList get training status",
+        "operationId": "PersonListgettrainingstatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },
+      "post": {
+        "summary": "PersonList train",
+        "operationId": "PersonListtrain",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/": {
+      "get": {
+        "summary": "PersonList get all",
+        "operationId": "PersonListgetall",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1/person": {
+      "post": {
+        "summary": "PersonListPerson create",
+        "operationId": "PersonListPersoncreate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "example": {
+                  "name": "tom holland_spideman",
+                  "userData": "actor tom holland"
+                }
+              },
+              "example": "{\r\n    \"name\":\"tom holland_spideman\", \r\n    \"userData\":\"actor tom holland\"\r\n}"
+            }
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3": {
+      "post": {
+        "summary": "PersonListPerson  add face",
+        "operationId": "PersonListPersonaddface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_1.jpg"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "PersonListPerson get all faces",
+        "operationId": "PersonListPersongetallfaces",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1/7e5b4248-2ccb-46b1-817a-1220fa2c8f9f": {
+      "post": {
+        "summary": "PersonListPerson  create face",
+        "operationId": "PersonListPersoncreateface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "userData"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "userData": {
+                    "type": "string",
+                    "example": "tom holland pic"
+                  }
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_2.png"
+                },
+                {
+                  "key": "userData",
+                  "value": "tom holland pic",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/v1/personlist/friends-group/6e4c0924-60fc-4109-b7c2-5f5643216bb0": {
+      "delete": {
+        "summary": "PersonListPerson delete",
+        "operationId": "PersonListPersondelete",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1/7e5b4248-2ccb-46b1-817a-1220fa2c8f9f/009a5738-a578-4fee-b21c-2a40f516ca14": {
+      "delete": {
+        "summary": "PersonListPerson delete face",
+        "operationId": "PersonListPersondeleteface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    },
+    "/v1/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3/a2785a0e-3dec-4e98-ac8d-b40a32d8785b": {
+      "get": {
+        "summary": "PersonListPerson get face data",
+        "operationId": "PersonListPersongetfacedata",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "start": {
+        "name": "start",
+        "in": "query",
+        "required": true,
+        "style": "form",
+        "schema": {
+          "type": "string",
+          "example": "first-large"
+        }
+      },
+      "top": {
+        "name": "top",
+        "in": "query",
+        "required": true,
+        "style": "form",
+        "schema": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "security": [],
+  "tags": [],
+  "externalDocs": {
+    "url": "",
+    "description": ""
+  },
+  "warnings": []
+}
