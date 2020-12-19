@@ -8,7 +8,7 @@ app.use(express.json())
 app.use('/v1', v1);
 
 app.use('/', (req, res)=>{
-  res.redirect("http://35.184.178.64:4000/v1/docs");
+  res.redirect("http://35.184.178.64:3000/v1/docs");
 })
 
-app.listen(4000, () => console.log('now graphql at localhost:4000'));
+app.listen(3000, () => console.log('now graphql at localhost:3000'));
