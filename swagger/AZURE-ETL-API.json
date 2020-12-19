@@ -446,7 +446,7 @@
             }
           },
           "400": {
-            "description": "Error code and message returned in JSON:\r\n<table class=\"element table\">\r\n<thead>\r\n<tr><th>Error Code</th><th>Error Message Description</th></tr>\r\n</thead>\r\n<tbody>\r\n<tr><td>BadArgument</td><td>Invalid request body.</td></tr>\r\n<tr><td>BadArgument</td><td>The argument maxNumOfCandidatesReturned is not valid. Range is [1,5]</td></tr>\r\n<tr><td>BadArgument</td><td>The argument confidenceThreshold is not valid. Range is [0, 1]</td></tr>\r\n<tr><td>BadArgument</td><td>Face ID is invalid.</td></tr>\r\n<tr><td>BadArgument</td><td>Person group ID is invalid. Valid format should be a string composed by numbers, English letters in lower case, '-', '_', and no longer than 64 characters.</td></tr>\r\n<tr><td>BadArgument</td><td>Large person group ID is invalid. Valid format should be a string composed by numbers, English letters in lower case, '-', '_', and no longer than 64 characters.</td></tr>\r\n<tr><td>BadArgument</td><td>'recognitionModel' is incompatible.</td></tr>\r\n<tr><td>PersonGroupIdAndLargePersonGroupIdBothNull</td><td>Large person group ID and person group ID are both null.</td></tr>\r\n<tr><td>PersonGroupNotFound</td><td>Person group is not found.</td></tr>\r\n<tr><td>LargePersonGroupNotFound</td><td>Large person group is not found.</td></tr>\r\n<tr><td>FaceNotFound</td><td>Face is not found.</td></tr>\r\n<tr><td>PersonGroupNotTrained</td><td>Person group not trained.</td></tr>\r\n<tr><td>LargePersonGroupNotTrained</td><td>Large person group not trained.</td></tr>\r\n<tr><td>PersonGroupTrainingNotFinished</td><td>Person group is under training.</td></tr>\r\n<tr><td>LargePersonGroupTrainingNotFinished</td><td>Large person group is under training.</td></tr>\r\n</tbody>\r\n</table>",
+            "description": "Error code and message returned in JSON: Error Code, Error Message Description, BadArgument, Invalid request body, BadArgument, The argument maxNumOfCandidatesReturned is not valid. Range is [1,5], BadArgument, The argument confidence Threshold is not valid. Range is [0, 1] BadArgument Face ID is invalid. BadArgument Person group ID is invalid. Valid format should be a string composed by numbers, English letters in lower case, '-', '_', and no longer than 64 characters. BadArgument Large person group ID is invalid. Valid format should be a string composed by numbers, English letters in lower case, '-', '_', and no longer than 64 characters. BadArgument 'recognitionModel' is incompatible. PersonGroupIdAndLargePersonGroupIdBothNull Large person group ID and person group ID are both null. PersonGroupNotFound Person group is not found. LargePersonGroupNotFound Large person group is not found. FaceNotFound Face is not found. PersonGroupNotTrained Person group not trained. LargePersonGroupNotTrained Large person group not trained. PersonGroupTrainingNotFinished Person group is under training. LargePersonGroupTrainingNotFinished Large person group is under training.",
             "examples": {
               "application/json": {
                 "error": {
@@ -700,7 +700,7 @@
         {
           "name": "faceListId",
           "in": "path",
-          "description": "Face list Id",
+          "description": "Valid character is letter in lower case or digit or '-' or '_', maximum length is 64.",
           "required": true,
           "schema": {
             "type": "string"
@@ -713,8 +713,62 @@
         "description": "Create an empty face list with user-specified faceListId, name, an optional userData and recognitionModel. Up to 64 face lists are allowed in one subscription.",
         "responses": {
           "200": {
+            "description": "A successful call returns an empty response body."
+          },
+          "401": {
+            "description": "Error code and message returned in JSON: Error Code, Error Message Description, Unspecified, Invalid subscription Key or user/plan is blocked.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "Unspecified",
+                  "message": "Access denied due to invalid subscription key. Make sure you are subscribed to an API you are trying to call and provide the right key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Face list number reached limit, maximum is 64.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "QuotaExceeded",
+                  "message": "Face list number reached limit."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error code and message returned in JSON: Error Code, Error Message Description, FaceListExists, Face list already exists, ConcurrentOperationConflict, Concurrent operation conflict on requested resource.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "FaceListExists",
+                  "message": "Face list already exists."
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type error",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Invalid Media Type."
+                }
+              }
+            }
+          },
+          "429": {
             "description": "",
-            "headers": {}
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 429,
+                  "message": "Rate limit is exceeded. Try again in 26 seconds."
+                }
+              }
+            }
           }
         },
         "requestBody": {
