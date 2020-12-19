@@ -316,12 +316,69 @@
       "post": {
         "summary": "Find Similar Faces from facelist",
         "operationId": "FaceFindSimilar",
-        "description": "Find the similarity between the face and someone in face list",
+        "description": "Find the similarity between the face and someone in face list. Either provide image of the face or provide faceId to be searched either in all your large face lists and face lists or given ids.",
         "parameters": [],
         "responses": {
           "200": {
+            "description": "A successful call returns an array of the most similar faces.",
+            "examples": {
+              "application/json": "[\r\n    {\r\n        \"persistedFaceId\" : \"015839fb-fbd9-4f79-ace9-7675fc2f1dd9\",\r\n        \"confidence\" : 0.82\r\n    },\r\n    ...\r\n]"
+            }
+          },
+          "400": {
+            "description": "Error code and message returned in JSON BadArgument (Invalid request body, Mode is invalid, maxNumOfCandidatesReturned is not valid, faceIds is not in a valid range, Face list ID is invalid)",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Request body is invalid."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error code and message returned in JSON Error Message Description (Invalid request body, Invalid subscription Key or user/plan is blocked)",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "Unspecified",
+                  "message": "Access denied due to invalid subscription key. Make sure you are subscribed to an API you are trying to call and provide the right key."
+                }
+              }
+            }
+          },
+          "403": {
             "description": "",
-            "headers": {}
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 403,
+                  "message": "Out of call volume quota. Quota will be replenished in 2 days."
+                }
+              }
+            },
+            "415": {
+              "description": "Unsupported media type error. Only \"application/json\" is valid for this API.\r\n",
+              "examples": {
+                "application/json": {
+                  "error": {
+                    "code": "BadArgument",
+                    "message": "Invalid Media Type."
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "",
+              "examples": {
+                "application/json": {
+                  "error": {
+                    "statusCode": 429,
+                    "message": "Rate limit is exceeded. Try again in 26 seconds."
+                  }
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -375,16 +432,95 @@
         }
       }
     },
-    "/v1/face/similar/": {
+    "/v1/face/verify/": {
       "post": {
-        "summary": "Find People from Person",
+        "summary": "Verification and Identification, both in the same endpoint",
         "operationId": "FaceFindPerson",
-        "description": "Find the similar person from the person group/large person group",
+        "description": "Verify whether two faces belong to a same person or whether one face belongs to a person. Or 1-to-many identification to find the closest matches of the specific query person face from a person group or large person group. And ",
         "parameters": [],
         "responses": {
           "200": {
+            "description": "A successful call returns the identified candidate person(s) for each query face.",
+            "examples": {
+              "application/json": "[\r\n    {\r\n        \"faceId\": \"c5c24a82-6845-4031-9d5d-978df9175426\",\r\n        \"candidates\": [\r\n            {\r\n                \"personId\": \"25985303-c537-4467-b41d-bdb45cd95ca1\",\r\n                \"confidence\": 0.92\r\n            }\r\n        ]\r\n    },\r\n    {\r\n        \"faceId\": \"65d083d4-9447-47d1-af30-b626144bf0fb\",\r\n        \"candidates\": [\r\n            {\r\n                \"personId\": \"2ae4935b-9659-44c3-977f-61fac20d0538\",\r\n                \"confidence\": 0.89\r\n            }\r\n        ]\r\n    }\r\n]"
+            }
+          },
+          "400": {
+            "description": "Error code and message returned in JSON: Error Code, Error Message Description, BadArgument, Invalid request body, BadArgument, The argument maxNumOfCandidatesReturned is not valid. Range is [1,5], BadArgument, The argument confidence Threshold is not valid. Range is [0, 1] BadArgument Face ID is invalid. BadArgument Person group ID is invalid. Valid format should be a string composed by numbers, English letters in lower case, '-', '_', and no longer than 64 characters. BadArgument Large person group ID is invalid. Valid format should be a string composed by numbers, English letters in lower case, '-', '_', and no longer than 64 characters. BadArgument 'recognitionModel' is incompatible. PersonGroupIdAndLargePersonGroupIdBothNull Large person group ID and person group ID are both null. PersonGroupNotFound Person group is not found. LargePersonGroupNotFound Large person group is not found. FaceNotFound Face is not found. PersonGroupNotTrained Person group not trained. LargePersonGroupNotTrained Large person group not trained. PersonGroupTrainingNotFinished Person group is under training. LargePersonGroupTrainingNotFinished Large person group is under training.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Large Person group is invalid."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error code and message returned in JSON:\r\n<table class=\"element table\">\r\n<thead>\r\n<tr><th>Error Code</th><th>Error Message Description</th></tr>\r\n</thead>\r\n<tbody>\r\n<tr><td>Unspecified</td><td>Invalid subscription Key or user/plan is blocked.</td></tr>\r\n</tbody>\r\n</table>\r\n",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "Unspecified",
+                  "message": "Access denied due to invalid subscription key. Make sure you are subscribed to an API you are trying to call and provide the right key."
+                }
+              }
+            }
+          },
+          "403": {
             "description": "",
-            "headers": {}
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 403,
+                  "message": "Out of call volume quota. Quota will be replenished in 2 days."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error code and message returned in JSON:\r\n<table class=\"element table\">\r\n\t<thead>\r\n\t\t<tr>\r\n\t\t\t<th>Error Code</th>\r\n\t\t\t<th>Error Message Description</th>\r\n\t\t</tr>\r\n\t</thead>\r\n\t<tbody>\r\n\t\t<tr>\r\n\t\t\t<td>FaceNotFound</td>\r\n\t\t\t<td>Face is not found. The faceId is expired or not exist.</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td>PersonNotFound</td>\r\n\t\t\t<td>Person is not found.</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td>PersonGroupNotFound</td>\r\n\t\t\t<td>Person Group is not found.</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td>LargePersonGroupNotFound</td>\r\n\t\t\t<td>Large Person Group is not found.</td>\r\n\t\t</tr>\r\n\t</tbody>\r\n\t</tbody>\r\n</table>",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "LargePersonGroupNotFound",
+                  "message": "Large person group is not found."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Training process is conflict with identify. Try identify again when training is finished.\r\n",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "LargePersonGroupTrainingNotFinished",
+                  "message": "Large person group is under training."
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type error. Only \"application/json\" is valid for this API.\r\n",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Invalid Media Type."
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 429,
+                  "message": "Rate limit is exceeded. Try again in 26 seconds."
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -441,24 +577,99 @@
       "post": {
         "summary": "Create temporary groups",
         "operationId": "FaceTemporaryGroups",
-        "description": "Create temporary group for quick assessment.",
+        "description": "Divide candidate faces into groups based on face similarity.The output is one or more disjointed face groups and a messyGroup. A face group contains faces that have similar looking, often of the same person. Face groups are ranked by group size, i.e. number of faces. Notice that faces belonging to a same person might be split into several groups in the result.",
         "parameters": [],
         "responses": {
           "200": {
+            "description": "A successful call returns one or more groups of similar faces (rank by group size) and a messyGroup.",
+            "examples": {
+              "application/json": {
+                "groups": [
+                  [
+                    "c5c24a82-6845-4031-9d5d-978df9175426",
+                    "015839fb-fbd9-4f79-ace9-7675fc2f1dd9",
+                    "fce92aed-d578-4d2e-8114-068f8af4492e",
+                    "b64d5e15-8257-4af2-b20a-5a750f8940e7"
+                  ],
+                  [
+                    "65d083d4-9447-47d1-af30-b626144bf0fb",
+                    "30ea1073-cc9e-4652-b1e3-d08fb7b95315"
+                  ]
+                ],
+                "messyGroup": [
+                  "be386ab3-af91-4104-9e6d-4dae4c9fddb7",
+                  "fbd2a038-dbff-452c-8e79-2ee81b1aa84e"
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Error code and message returned in JSON:\r\n<table class=\"element table\">\r\n<thead>\r\n<tr><th>Error Code</th><th>Error Message Description</th></tr>\r\n</thead>\r\n<tbody>\r\n<tr><td>BadArgument</td><td>Request body is invalid.</td></tr>\r\n<tr><td>BadArgument</td><td>The length of faceIds is not in a valid range. Out of range [2, 1000].</td></tr>\r\n<tr><td>BadArgument</td><td>'recognitionModel' is incompatible.</td></tr>\r\n<tr><td>FaceNotFound</td><td>Current face is not found.</td></tr>\r\n</tbody>\r\n</table>\r\n",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Request body is invalid."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error code and message returned in JSON:\r\n<table class=\"element table\">\r\n<thead>\r\n<tr><th>Error Code</th><th>Error Message Description</th></tr>\r\n</thead>\r\n<tbody>\r\n<tr><td>Unspecified</td><td>Invalid subscription Key or user/plan is blocked.</td></tr>\r\n</tbody>\r\n</table>\r\n",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "Unspecified",
+                  "message": "Access denied due to invalid subscription key. Make sure you are subscribed to an API you are trying to call and provide the right key."
+                }
+              }
+            }
+          },
+          "403": {
             "description": "",
-            "headers": {}
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 403,
+                  "message": "Out of call volume quota. Quota will be replenished in 2 days."
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type error. Only \"application/json\" is valid for this API.\r\n",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Invalid Media Type."
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 429,
+                  "message": "Rate limit is exceeded. Try again in 26 seconds."
+                }
+              }
+            }
           }
         },
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "required": [],
                 "properties": {
                   "faceIds": {
                     "type": "string",
-                    "description": "If you've a collection of faceIds which can contain the person you're trying to match to"
+                    "description": "If you've a collection of faceIds which can contain the person you're trying to match to",
+                    "example": "{\r\n    \"faceIds\": [\r\n        \"c5c24a82-6845-4031-9d5d-978df9175426\",\r\n        \"015839fb-fbd9-4f79-ace9-7675fc2f1dd9\",\r\n        \"65d083d4-9447-47d1-af30-b626144bf0fb\",\r\n        \"fce92aed-d578-4d2e-8114-068f8af4492e\",\r\n        \"30ea1073-cc9e-4652-b1e3-d08fb7b95315\",\r\n        \"be386ab3-af91-4104-9e6d-4dae4c9fddb7\",\r\n        \"fbd2a038-dbff-452c-8e79-2ee81b1aa84e\",\r\n        \"b64d5e15-8257-4af2-b20a-5a750f8940e7\"\r\n    ]\r\n}"
                   },
                   "azureId": {
                     "type": "string",
@@ -473,7 +684,7 @@
     },
     "/v1/facelist": {
       "get": {
-        "summary": "FaceList get all face lists",
+        "summary": "FaceList get all face lists created till date.",
         "operationId": "FaceListGetAll",
         "parameters": [],
         "responses": {
@@ -489,7 +700,7 @@
         {
           "name": "faceListId",
           "in": "path",
-          "description": "Face list Id",
+          "description": "Valid character is letter in lower case or digit or '-' or '_', maximum length is 64.",
           "required": true,
           "schema": {
             "type": "string"
@@ -499,10 +710,65 @@
       "put": {
         "summary": "Create Facelist",
         "operationId": "FaceListCreate",
+        "description": "Create an empty face list with user-specified faceListId, name, an optional userData and recognitionModel. Up to 64 face lists are allowed in one subscription.",
         "responses": {
           "200": {
+            "description": "A successful call returns an empty response body."
+          },
+          "401": {
+            "description": "Error code and message returned in JSON: Error Code, Error Message Description, Unspecified, Invalid subscription Key or user/plan is blocked.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "Unspecified",
+                  "message": "Access denied due to invalid subscription key. Make sure you are subscribed to an API you are trying to call and provide the right key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Face list number reached limit, maximum is 64.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "QuotaExceeded",
+                  "message": "Face list number reached limit."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error code and message returned in JSON: Error Code, Error Message Description, FaceListExists, Face list already exists, ConcurrentOperationConflict, Concurrent operation conflict on requested resource.",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "FaceListExists",
+                  "message": "Face list already exists."
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type error",
+            "examples": {
+              "application/json": {
+                "error": {
+                  "code": "BadArgument",
+                  "message": "Invalid Media Type."
+                }
+              }
+            }
+          },
+          "429": {
             "description": "",
-            "headers": {}
+            "examples": {
+              "application/json": {
+                "error": {
+                  "statusCode": 429,
+                  "message": "Rate limit is exceeded. Try again in 26 seconds."
+                }
+              }
+            }
           }
         },
         "requestBody": {
@@ -632,7 +898,8 @@
           "schema": {
             "type": "string"
           }
-        },{
+        },
+        {
           "name": "persistedFaceId",
           "in": "path",
           "description": "Persisted Face Id",
@@ -651,7 +918,7 @@
             "headers": {},
             "content": {
               "application/json": {
-                "schema":{
+                "schema": {
                   "properties": {
                     "name": "success",
                     "type": "boolean",
@@ -706,15 +973,17 @@
           }
         }
       },
-      "get":{
+      "get": {
         "summary": "LargeFaceList get facelist meta data",
         "operationId": "LargeFaceListMetaData",
-        "parameters": [{
-          "$ref": "#/components/parameters/start"
-        },
-        {
-          "$ref": "#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -728,7 +997,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -754,7 +1023,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -763,7 +1032,7 @@
           }
         }
       },
-      "patch":{
+      "patch": {
         "summary": "Update Large face list",
         "operationId": "LargeFaceListUpdate",
         "parameters": [],
@@ -795,7 +1064,7 @@
           }
         }
       },
-      "post":{
+      "post": {
         "summary": "LargeFaceList add face",
         "operationId": "LargeFaceListaddface",
         "parameters": [],
@@ -826,10 +1095,10 @@
                     "type": "string",
                     "example": "one two three"
                   },
-                  "targetFace":{
+                  "targetFace": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -849,7 +1118,8 @@
           "schema": {
             "type": "string"
           }
-        },{
+        },
+        {
           "name": "persistedFaceId",
           "in": "path",
           "description": "Persisted Face Id",
@@ -876,7 +1146,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -885,7 +1155,7 @@
           }
         }
       },
-      "get":{
+      "get": {
         "summary": "LargeFaceList get facelist meta data",
         "operationId": "LargeFaceListMetaData",
         "responses": {
@@ -901,7 +1171,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -912,9 +1182,11 @@
       }
     },
     "/v1/largefacelist/{largeFaceListId}/train": {
-      "parameters": [{
-        "$ref": "#/components/parameters/largeFaceListId"
-      }],
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/largeFaceListId"
+        }
+      ],
       "get": {
         "summary": "LargeFaceList get all",
         "operationId": "LargeFaceListgetall",
@@ -924,8 +1196,8 @@
             "headers": {}
           }
         }
-      },      
-      "post":{
+      },
+      "post": {
         "summary": "LargeFaceList add face",
         "operationId": "LargeFaceListaddface",
         "responses": {
@@ -941,7 +1213,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -955,13 +1227,17 @@
       "get": {
         "summary": "Get Faces inside large face list",
         "operationId": "LargeFaceListGet",
-        "parameters": [{
-          "$ref": "#/components/parameters/largeFaceListId"
-        },{
-          "$ref": "#/components/parameters/start"
-        },{
-          "$ref": "#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/largeFaceListId"
+          },
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -975,7 +1251,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -986,7 +1262,7 @@
       }
     },
     "/v1/largefacelist/train": {
-      "post":{
+      "post": {
         "summary": "Train all the LargeFaceList",
         "operationId": "LargeFaceListaddface",
         "responses": {
@@ -1001,7 +1277,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1012,14 +1288,17 @@
       }
     },
     "/v1/largefacelist": {
-      "post":{
+      "post": {
         "summary": "Get all the Large Face Lists",
         "operationId": "LargeFaceListAll",
-        "parameters": [{
-          "$ref": "#/components/parameters/start"
-        },{
-          "$ref": "#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1032,7 +1311,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1065,13 +1344,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name":{
+                  "name": {
                     "type": "string"
                   },
-                  "userData":{
+                  "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1097,7 +1376,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1106,15 +1385,17 @@
           }
         }
       },
-      "get":{
+      "get": {
         "summary": "PersonList delete",
         "operationId": "PersonListdelete",
-        "parameters": [{
-          "$ref": "#/components/parameters/start"
-        },
-        {
-          "$ref": "#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1128,7 +1409,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1154,13 +1435,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name":{
+                  "name": {
                     "type": "string"
                   },
-                  "userData":{
+                  "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1187,7 +1468,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1220,7 +1501,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1246,7 +1527,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1260,11 +1541,14 @@
       "get": {
         "summary": "PersonList get all",
         "operationId": "PersonListgetall",
-        "parameters": [{
-          "$ref":"#/components/parameters/start"
-        },{
-          "$ref":"#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1278,7 +1562,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1317,7 +1601,7 @@
                   "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1431,7 +1715,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-               "properties": {
+                "properties": {
                   "userData": {
                     "type": "string",
                     "required": false
@@ -1543,7 +1827,7 @@
                   "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1553,7 +1837,6 @@
         }
       }
     },
-
     "/v1/largepersonlist/{largePersonGroupId}": {
       "parameters": [
         {
@@ -1577,13 +1860,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name":{
+                  "name": {
                     "type": "string"
                   },
-                  "userData":{
+                  "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1608,7 +1891,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1617,15 +1900,17 @@
           }
         }
       },
-      "get":{
+      "get": {
         "summary": "Large PersonList delete",
         "operationId": "LargePersonListdelete",
-        "parameters": [{
-          "$ref": "#/components/parameters/start"
-        },
-        {
-          "$ref": "#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1639,7 +1924,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1665,13 +1950,13 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name":{
+                  "name": {
                     "type": "string"
                   },
-                  "userData":{
+                  "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1698,7 +1983,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1731,7 +2016,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1757,7 +2042,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1771,11 +2056,14 @@
       "get": {
         "summary": "Large PersonList get all",
         "operationId": "LargePersonListgetall",
-        "parameters": [{
-          "$ref":"#/components/parameters/start"
-        },{
-          "$ref":"#/components/parameters/top"
-        }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/start"
+          },
+          {
+            "$ref": "#/components/parameters/top"
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -1789,7 +2077,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1828,7 +2116,7 @@
                   "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
@@ -1942,7 +2230,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-               "properties": {
+                "properties": {
                   "userData": {
                     "type": "string",
                     "required": false
@@ -2054,7 +2342,7 @@
                   "userData": {
                     "type": "string"
                   },
-                  "azureId":{
+                  "azureId": {
                     "type": "string"
                   }
                 }
