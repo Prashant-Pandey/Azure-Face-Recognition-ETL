@@ -1,0 +1,420 @@
+{
+	"info": {
+		"_postman_id": "75d2be73-b086-49dc-afd1-7a254dcd9a9c",
+		"name": "ETL API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Face Detection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "img",
+							"type": "file",
+							"src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_1.jpg"
+						},
+						{
+							"key": "location",
+							"value": "true",
+							"type": "text",
+							"disabled": true
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/v1/face"
+			},
+			"response": []
+		},
+		{
+			"name": "Find Similar",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"faceId\": \"\",\r\n    \"largeFaceListId\": \"\",\r\n    \"maxFaceLimit\": 10,\r\n    \"mode\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/v1/face/similar/"
+			},
+			"response": []
+		},
+		{
+			"name": "FaceList get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/v1/facelist"
+			},
+			"response": []
+		},
+		{
+			"name": "FaceList create",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"pizza-faces-data\",\r\n    \"description\":\"faces i see in pizza\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/facelist/pizza-gate-faces"
+			},
+			"response": []
+		},
+		{
+			"name": "FaceList delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": "http://localhost:4000/facelist/pizza-gate-faces"
+			},
+			"response": []
+		},
+		{
+			"name": "FaceList add face",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "img",
+							"type": "file",
+							"src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_3.jpg"
+						},
+						{
+							"key": "userData",
+							"value": "one two three",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:4000/facelist/pizza-gate-faces/face"
+			},
+			"response": []
+		},
+		{
+			"name": "FaceList get face data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/facelist/pizza-gate-faces"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList create",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"first-large-list\",\r\n    \"description\": \"first-large-list\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/v1/largefacelist/first-large-list1"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList get facelist data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/largefacelist/first-large-list1"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList add face",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "img",
+							"type": "file",
+							"src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_3.jpg"
+						},
+						{
+							"key": "userData",
+							"value": "one two three",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:4000/largefacelist/first-large-list1"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:4000/largefacelist/first-large-list"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList delete face",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:4000/largefacelist/first-large-list1/31d86ee2-2f42-4ae9-b1d7-6b790332546a"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/largefacelist?start=first-large",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"largefacelist"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "first-large"
+						},
+						{
+							"key": "top",
+							"value": "10",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceList get one by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/largefacelist/first-large-list1/"
+			},
+			"response": []
+		},
+		{
+			"name": "LargeFaceListTrain",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "http://localhost:4000/largefacelist/first-large-list1/train"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonList create",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"large person list\",\r\n    \"userData\":\"randome user person list\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/personlist/person-list-2"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonList delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:4000/personlist/person-list-2"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonList get one by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/personlist/person-list-1"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonList get training status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/personlist/person-list-1/train"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonList get all",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/personlist/"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonList train",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "http://localhost:4000/personlist/person-list-1/train"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"tom holland_spideman\", \r\n    \"userData\":\"actor tom holland\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:4000/personlist/person-list-1/person"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson  add face",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "img",
+							"type": "file",
+							"src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_1.jpg"
+						}
+					]
+				},
+				"url": "http://localhost:4000/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson  create face",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "img",
+							"type": "file",
+							"src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_2.png"
+						},
+						{
+							"key": "userData",
+							"value": "tom holland pic",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:4000/personlist/person-list-1/7e5b4248-2ccb-46b1-817a-1220fa2c8f9f"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:4000/personlist/friends-group/6e4c0924-60fc-4109-b7c2-5f5643216bb0"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson delete face",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:4000/personlist/person-list-1/7e5b4248-2ccb-46b1-817a-1220fa2c8f9f/009a5738-a578-4fee-b21c-2a40f516ca14"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson get all faces",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3"
+			},
+			"response": []
+		},
+		{
+			"name": "PersonListPerson get face data",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:4000/v1/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3/a2785a0e-3dec-4e98-ac8d-b40a32d8785b"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
