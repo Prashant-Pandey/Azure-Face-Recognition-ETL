@@ -5,7 +5,7 @@ const connectAPI = require("../service/api.service");
 const {
   getFaceDetection, getLimitedFaceDetection,
   getSimilarFaces, createMessyGroup,
-  indentify, verify
+  indentifyFaces, verify
 } = require("../service/face.service")
 
 router.post('/', upload.single('img'), uploadToAzure, async (req, res) => {
@@ -45,14 +45,22 @@ router.post( '/similar',
       faceListId,
       largeFaceListId,
       faceIds,
+      personGroupId,
+      largePersonGroupId,
       maxFaceLimit,
       mode,
       azureId
     } = req.body;
 
     const imageUrl = req.imgFileURL;
+    let response;
 
-    const response = await getSimilarFaces(imageUrl, faceId, faceListId, largeFaceListId, faceIds, maxFaceLimit, mode, azureId);
+    if ((typeof imageUrl !== 'string' && imageUrl.length > 1)|| (personGroupId||largePersonGroupId)) {
+      // image url can be array
+      response = await indentifyFaces(imageUrl, faceIds, personGroupId, largePersonGroupId, maxFaceLimit, mode, azureId);
+    }else{
+      response = await getSimilarFaces(imageUrl, faceId, faceListId, largeFaceListId, faceIds, maxFaceLimit, mode, azureId);
+    }
 
     if (response.error) {
       return res.status(response.status).send(response);
@@ -73,19 +81,6 @@ router.post('/group', async (req, res) => {
   }
 
   return res.json(response);
-});
-
-router.post('/identify', async (req, res) => {
-  const { largePersonGroupId, faceIds, maxFaceLimit, confidenceThreshold, azureId } = req.body;
-  const response = await indentify(largePersonGroupId, faceIds, maxFaceLimit, confidenceThreshold, azureId);
-
-  if (response.error) {
-    res.status(response.status);
-    res.send(response.message);
-    return;
-  }
-
-  res.json(response);
 });
 
 router.post('/verify', upload.any('img'), uploadToAzure, async (req, res) => {

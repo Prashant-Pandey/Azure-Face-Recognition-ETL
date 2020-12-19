@@ -22,7 +22,8 @@
   "paths": {
     "/v1/face": {
       "post": {
-        "summary": "Get attributes and features of the uploaded face",
+        "summary": "Get attributes and features of faces in the uploaded image",
+        "description": "API can be used to detect human faces in an image and returns the face rectangles and faceIds, and optionally with location, features, landmark, emotions, characterstics, and noises.",
         "operationId": "FaceDetection",
         "parameters": [],
         "responses": {
@@ -31,7 +32,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type":"array",
+                  "type": "array",
                   "example": [
                     {
                       "faceId": "a261eba4-3d81-40b9-80de-863513b2cffd",
@@ -242,7 +243,6 @@
           }
         },
         "requestBody": {
-          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
@@ -253,16 +253,52 @@
                 "properties": {
                   "img": {
                     "type": "file",
-                    "format": "image/jpg"
+                    "format": "image/jpg",
+                    "description": "Send image of the person",
+                    "required": true
                   },
-                  "location": {}
+                  "location": {
+                    "type": "boolean",
+                    "description": "Send true if you want face location in the image: face pixel position in the image",
+                    "required": false
+                  },
+                  "features": {
+                    "type": "boolean",
+                    "description": "Send true if you want face features in the image: headPose, glasses, facialHair, makeup, accessories, hair",
+                    "required": false
+                  },
+                  "landmark": {
+                    "type": "boolean",
+                    "description": "Send true if you want face landmarks in the image",
+                    "required": false
+                  },
+                  "emotions": {
+                    "type": "boolean",
+                    "description": "Send true if you want the emotions of the faces in the image: smile, emotion",
+                    "required": false
+                  },
+                  "characterstics": {
+                    "type": "boolean",
+                    "description": "Send true if you want face characterstics in the image: age, gender",
+                    "required": false
+                  },
+                  "noises": {
+                    "type": "boolean",
+                    "description": "Send true if you want noises on the faces in the image: occlusion, exposure, noise, blur",
+                    "required": false
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "description": "You can send your own azure key",
+                    "required": false
+                  }
                 }
               },
               "example": [
                 {
                   "key": "img",
                   "type": "file",
-                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_1.jpg"
+                  "src": "../testing_photos/tom_holland_1.jpg"
                 },
                 {
                   "key": "location",
@@ -276,10 +312,11 @@
         }
       }
     },
-    "/v1/face/similar/": {
+    "/v1/face/similar": {
       "post": {
-        "summary": "Find Similar",
-        "operationId": "FindSimilar",
+        "summary": "Find Similar Faces from facelist",
+        "operationId": "FaceFindSimilar",
+        "description": "Find the similarity between the face and someone in face list",
         "parameters": [],
         "responses": {
           "200": {
@@ -288,19 +325,147 @@
           }
         },
         "requestBody": {
-          "required": true,
           "content": {
-            "text/plain": {
+            "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "example": {
-                  "faceId": "",
-                  "largeFaceListId": "",
-                  "maxFaceLimit": 10,
-                  "mode": ""
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "img": {
+                    "type": "file",
+                    "format": "image/jpg",
+                    "description": "Send both the images"
+                  },
+                  "faceId": {
+                    "type": "string",
+                    "description": "If you've faceId of the person you're trying to match"
+                  },
+                  "faceListId": {
+                    "type": "string",
+                    "description": "If you've faceListId of the person you're trying to match to"
+                  },
+                  "largeFaceListId": {
+                    "type": "string",
+                    "description": "If you've largeFaceListId of the person you're trying to match to"
+                  },
+                  "faceIds": {
+                    "type": "string",
+                    "description": "If you've a collection of faceIds which can contain the person you're trying to match to"
+                  },
+                  "maxFaceLimit": {
+                    "type": "integer",
+                    "description": "Maximum limit of matches"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "matchPerson",
+                      "matchFace"
+                    ],
+                    "description": "Mode of match"
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "description": "If you've faceId of the person you're trying to match"
+                  }
                 }
-              },
-              "example": "{\r\n    \"faceId\": \"\",\r\n    \"largeFaceListId\": \"\",\r\n    \"maxFaceLimit\": 10,\r\n    \"mode\": \"\"\r\n}"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/face/similar/": {
+      "post": {
+        "summary": "Find People from Person",
+        "operationId": "FaceFindPerson",
+        "description": "Find the similar person from the person group/large person group",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "img": {
+                    "type": "array",
+                    "description": "Send both the images",
+                    "items": {
+                      "type": "file",
+                      "format": "image/jpg"
+                    }
+                  },
+                  "faceIds": {
+                    "type": "string",
+                    "description": "If you've a collection of faceIds which can contain the person you're trying to match to"
+                  },
+                  "personGroupId": {
+                    "type": "string",
+                    "description": "If you've faceListId of the person you're trying to match to"
+                  },
+                  "largePersonGroupId": {
+                    "type": "string",
+                    "description": "If you've largeFaceListId of the person you're trying to match to"
+                  },
+                  "maxFaceLimit": {
+                    "type": "integer",
+                    "description": "Maximum limit of matches"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "matchPerson",
+                      "matchFace"
+                    ],
+                    "description": "Mode of match"
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "description": "If you've faceId of the person you're trying to match"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/face/group": {
+      "post": {
+        "summary": "Create temporary groups",
+        "operationId": "FaceTemporaryGroups",
+        "description": "Create temporary group for quick assessment.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                  "faceIds": {
+                    "type": "string",
+                    "description": "If you've a collection of faceIds which can contain the person you're trying to match to"
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "description": "If you've faceId of the person you're trying to match"
+                  }
+                }
+              }
             }
           }
         }
@@ -308,8 +473,8 @@
     },
     "/v1/facelist": {
       "get": {
-        "summary": "FaceList get all",
-        "operationId": "FaceListgetall",
+        "summary": "FaceList get all face lists",
+        "operationId": "FaceListGetAll",
         "parameters": [],
         "responses": {
           "200": {
@@ -319,11 +484,21 @@
         }
       }
     },
-    "/v1/facelist/pizza-gate-faces": {
+    "/v1/facelist/{faceListId}": {
+      "parameters": [
+        {
+          "name": "faceListId",
+          "in": "path",
+          "description": "Face list Id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
       "put": {
-        "summary": "FaceList create",
-        "operationId": "FaceListcreate",
-        "parameters": [],
+        "summary": "Create Facelist",
+        "operationId": "FaceListCreate",
         "responses": {
           "200": {
             "description": "",
@@ -333,23 +508,25 @@
         "requestBody": {
           "required": true,
           "content": {
-            "text/plain": {
+            "application/json": {
               "schema": {
-                "type": "string",
-                "example": {
-                  "name": "pizza-faces-data",
-                  "description": "faces i see in pizza"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
                 }
-              },
-              "example": "{\r\n    \"name\":\"pizza-faces-data\",\r\n    \"description\":\"faces i see in pizza\"\r\n}"
+              }
             }
           }
         }
       },
       "delete": {
-        "summary": "FaceList delete",
-        "operationId": "FaceListdelete",
-        "parameters": [],
+        "summary": "Delete Face List",
+        "operationId": "FaceListDelete",
         "responses": {
           "200": {
             "description": "",
@@ -358,21 +535,46 @@
         }
       },
       "get": {
-        "summary": "FaceList get face data",
+        "summary": "Get Face List data",
         "operationId": "FaceListgetfacedata",
-        "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
         }
-      }
-    },
-    "/v1/facelist/pizza-gate-faces/face": {
+      },
+      "patch": {
+        "summary": "Update Facelist meta data",
+        "operationId": "FaceListUpdate",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
-        "summary": "FaceList add face",
-        "operationId": "FaceListaddface",
+        "summary": "Add face to Face list",
+        "operationId": "FaceListAddFace",
         "parameters": [],
         "responses": {
           "200": {
@@ -387,13 +589,15 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "file",
+                  "img",
                   "userData"
                 ],
                 "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
+                  "img": {
+                    "type": "file",
+                    "format": "image/jpg",
+                    "description": "Send image of the person",
+                    "required": true
                   },
                   "userData": {
                     "type": "string",
@@ -418,7 +622,54 @@
         }
       }
     },
-    "/v1/largefacelist/first-large-list1": {
+    "/v1/facelist/{faceListId}/{persistedFaceId}": {
+      "parameters": [
+        {
+          "name": "faceListId",
+          "in": "path",
+          "description": "Face list Id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },{
+          "name": "persistedFaceId",
+          "in": "path",
+          "description": "Persisted Face Id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "delete": {
+        "summary": "Delete Face from List",
+        "operationId": "FaceListFaceDelete",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema":{
+                  "properties": {
+                    "name": "success",
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/{largeFaceListId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/largeFaceListId"
+        }
+      ],
       "put": {
         "summary": "LargeFaceList create",
         "operationId": "LargeFaceListcreate",
@@ -432,33 +683,119 @@
         "requestBody": {
           "required": true,
           "content": {
-            "text/plain": {
+            "application/json": {
               "schema": {
                 "type": "string",
-                "example": {
-                  "name": "first-large-list",
-                  "description": "first-large-list"
+                "required": [
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "azureId": {
+                    "type": "string"
+                  }
                 }
-              },
-              "example": "{\r\n    \"name\": \"first-large-list\",\r\n    \"description\": \"first-large-list\"\r\n}"
+              }
             }
           }
         }
-      }
-    },
-    "/v1/largefacelist/first-large-list1": {
-      "get": {
-        "summary": "LargeFaceList get facelist data",
-        "operationId": "LargeFaceListgetfacelistdata",
+      },
+      "get":{
+        "summary": "LargeFaceList get facelist meta data",
+        "operationId": "LargeFaceListMetaData",
+        "parameters": [{
+          "$ref": "#/components/parameters/start"
+        },
+        {
+          "$ref": "#/components/parameters/top"
+        }],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "LargeFaceList delete",
+        "operationId": "LargeFaceListdelete",
         "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       },
-      "post": {
+      "patch":{
+        "summary": "Update Large face list",
+        "operationId": "LargeFaceListUpdate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "azureId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post":{
         "summary": "LargeFaceList add face",
         "operationId": "LargeFaceListaddface",
         "parameters": [],
@@ -475,51 +812,53 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "file",
+                  "img",
                   "userData"
                 ],
                 "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
+                  "img": {
+                    "type": "file",
+                    "format": "image/jpg",
+                    "description": "Send image of the person",
+                    "required": true
                   },
                   "userData": {
                     "type": "string",
                     "example": "one two three"
+                  },
+                  "targetFace":{
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
                   }
                 }
-              },
-              "example": [
-                {
-                  "key": "img",
-                  "type": "file",
-                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_3.jpg"
-                },
-                {
-                  "key": "userData",
-                  "value": "one two three",
-                  "type": "text"
-                }
-              ]
+              }
             }
           }
         }
       }
     },
-    "/v1/largefacelist/first-large-list": {
-      "delete": {
-        "summary": "LargeFaceList delete",
-        "operationId": "LargeFaceListdelete",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "headers": {}
+    "/v1/largefacelist/{largeFaceListId}/{persistedFaceId}": {
+      "parameters": [
+        {
+          "name": "largeFaceListId",
+          "in": "path",
+          "description": "Large Face list Id",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },{
+          "name": "persistedFaceId",
+          "in": "path",
+          "description": "Persisted Face Id",
+          "required": true,
+          "schema": {
+            "type": "string"
           }
         }
-      }
-    },
-    "/v1/largefacelist/first-large-list1/31d86ee2-2f42-4ae9-b1d7-6b790332546a": {
+      ],
       "delete": {
         "summary": "LargeFaceList delete face",
         "operationId": "LargeFaceListdeleteface",
@@ -529,56 +868,186 @@
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get":{
+        "summary": "LargeFaceList get facelist meta data",
+        "operationId": "LargeFaceListMetaData",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/{largeFaceListId}/train": {
+      "parameters": [{
+        "$ref": "#/components/parameters/largeFaceListId"
+      }],
+      "get": {
+        "summary": "LargeFaceList get all",
+        "operationId": "LargeFaceListgetall",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        }
+      },      
+      "post":{
+        "summary": "LargeFaceList add face",
+        "operationId": "LargeFaceListaddface",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/{largeFaceListId}/faces": {
+      "get": {
+        "summary": "Get Faces inside large face list",
+        "operationId": "LargeFaceListGet",
+        "parameters": [{
+          "$ref": "#/components/parameters/largeFaceListId"
+        },{
+          "$ref": "#/components/parameters/start"
+        },{
+          "$ref": "#/components/parameters/top"
+        }],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largefacelist/train": {
+      "post":{
+        "summary": "Train all the LargeFaceList",
+        "operationId": "LargeFaceListaddface",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
     "/v1/largefacelist": {
-      "get": {
-        "summary": "LargeFaceList get all",
-        "operationId": "LargeFaceListgetall",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/start"
-          },
-          {
-            "$ref": "#/components/parameters/top"
-          }
-        ],
+      "post":{
+        "summary": "Get all the Large Face Lists",
+        "operationId": "LargeFaceListAll",
+        "parameters": [{
+          "$ref": "#/components/parameters/start"
+        },{
+          "$ref": "#/components/parameters/top"
+        }],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
-        }
-      }
-    },
-    "/v1/largefacelist/first-large-list1/": {
-      "get": {
-        "summary": "LargeFaceList get one by id",
-        "operationId": "LargeFaceListgetonebyid",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "headers": {}
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
-    "/v1/largefacelist/first-large-list1/train": {
-      "post": {
-        "summary": "LargeFaceListTrain",
-        "operationId": "LargeFaceListTrain",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "headers": {}
-          }
+    "/v1/personlist/{personGroupId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/personGroupId"
         }
-      }
-    },
-    "/v1/personlist/person-list-2": {
+      ],
       "put": {
         "summary": "PersonList create",
         "operationId": "PersonListcreate",
@@ -592,15 +1061,21 @@
         "requestBody": {
           "required": true,
           "content": {
-            "text/plain": {
+            "application/json": {
               "schema": {
-                "type": "string",
-                "example": {
-                  "name": "large person list",
-                  "userData": "randome user person list"
+                "type": "object",
+                "properties": {
+                  "name":{
+                    "type": "string"
+                  },
+                  "userData":{
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
                 }
-              },
-              "example": "{\r\n    \"name\":\"large person list\",\r\n    \"userData\":\"randome user person list\"\r\n}"
+              }
             }
           }
         }
@@ -614,23 +1089,120 @@
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
-      }
-    },
-    "/v1/personlist/person-list-1": {
-      "get": {
-        "summary": "PersonList get one by id",
-        "operationId": "PersonListgetonebyid",
+      },
+      "get":{
+        "summary": "PersonList delete",
+        "operationId": "PersonListdelete",
+        "parameters": [{
+          "$ref": "#/components/parameters/start"
+        },
+        {
+          "$ref": "#/components/parameters/top"
+        }],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PersonList update",
+        "operationId": "PersonListUpdate",
         "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name":{
+                    "type": "string"
+                  },
+                  "userData":{
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/v1/personlist/person-list-1/train": {
+    "/v1/personlist/train": {
+      "get": {
+        "summary": "Train all person list",
+        "operationId": "PersonListTrainAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/personlist/{personGroupId}/train": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/personGroupId"
+        }
+      ],
       "get": {
         "summary": "PersonList get training status",
         "operationId": "PersonListgettrainingstatus",
@@ -639,6 +1211,21 @@
           "200": {
             "description": "",
             "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -651,6 +1238,21 @@
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -658,16 +1260,40 @@
       "get": {
         "summary": "PersonList get all",
         "operationId": "PersonListgetall",
-        "parameters": [],
+        "parameters": [{
+          "$ref":"#/components/parameters/start"
+        },{
+          "$ref":"#/components/parameters/top"
+        }],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
-    "/v1/personlist/person-list-1/person": {
+    "/v1/personlist/{personGroupId}/person": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/personGroupId"
+        }
+      ],
       "post": {
         "summary": "PersonListPerson create",
         "operationId": "PersonListPersoncreate",
@@ -684,22 +1310,35 @@
             "text/plain": {
               "schema": {
                 "type": "string",
-                "example": {
-                  "name": "tom holland_spideman",
-                  "userData": "actor tom holland"
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "userData": {
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
                 }
-              },
-              "example": "{\r\n    \"name\":\"tom holland_spideman\", \r\n    \"userData\":\"actor tom holland\"\r\n}"
+              }
             }
           }
         }
       }
     },
-    "/v1/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3": {
+    "/v1/personlist/{personGroupId}/{personId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/personGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/personId"
+        }
+      ],
       "post": {
-        "summary": "PersonListPerson  add face",
+        "summary": "PersonListPerson add face",
         "operationId": "PersonListPersonaddface",
-        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -707,18 +1346,31 @@
           }
         },
         "requestBody": {
-          "required": true,
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "required": [
-                  "file"
+                  "img"
                 ],
                 "properties": {
-                  "file": {
+                  "img": {
+                    "type": "file",
+                    "format": "image/jpg",
+                    "description": "Send image of the person",
+                    "required": true
+                  },
+                  "userData": {
                     "type": "string",
-                    "format": "binary"
+                    "required": false
+                  },
+                  "targetFace": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "required": false
                   }
                 }
               },
@@ -726,7 +1378,13 @@
                 {
                   "key": "img",
                   "type": "file",
-                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_1.jpg"
+                  "src": "../testing_photos/tom_holland_1.jpg"
+                },
+                {
+                  "key": "location",
+                  "value": "true",
+                  "type": "text",
+                  "disabled": true
                 }
               ]
             }
@@ -742,13 +1400,169 @@
             "description": "",
             "headers": {}
           }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "PersonListPerson Update person meta data",
+        "operationId": "PersonListPersonUpdateFace",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+               "properties": {
+                  "userData": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "../testing_photos/tom_holland_1.jpg"
+                },
+                {
+                  "key": "location",
+                  "value": "true",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          }
         }
       }
     },
-    "/v1/personlist/person-list-1/7e5b4248-2ccb-46b1-817a-1220fa2c8f9f": {
-      "post": {
-        "summary": "PersonListPerson  create face",
-        "operationId": "PersonListPersoncreateface",
+    "/v1/personlist/{personGroupId}/{personId}/{persistedFaceId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/personGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/personId"
+        },
+        {
+          "$ref": "#/components/parameters/persistedFaceId"
+        }
+      ],
+      "delete": {
+        "summary": "PersonListPerson delete face",
+        "operationId": "PersonListPersondeleteface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "PersonListPerson Get face",
+        "operationId": "PersonListPersondeleteface",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Facelist meta data",
+        "operationId": "FaceListUpdate",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userData": {
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/v1/largepersonlist/{largePersonGroupId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/largePersonGroupId"
+        }
+      ],
+      "put": {
+        "summary": "Large PersonList create",
+        "operationId": "LargePersonListCreate",
         "parameters": [],
         "responses": {
           "200": {
@@ -759,21 +1573,315 @@
         "requestBody": {
           "required": true,
           "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name":{
+                    "type": "string"
+                  },
+                  "userData":{
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Large PersonList delete",
+        "operationId": "LargePersonListdelete",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get":{
+        "summary": "Large PersonList delete",
+        "operationId": "LargePersonListdelete",
+        "parameters": [{
+          "$ref": "#/components/parameters/start"
+        },
+        {
+          "$ref": "#/components/parameters/top"
+        }],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "LargePersonList update",
+        "operationId": "LargePersonListUpdate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name":{
+                    "type": "string"
+                  },
+                  "userData":{
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largepersonlist/train": {
+      "get": {
+        "summary": "Train all Large person list",
+        "operationId": "LargePersonListTrainAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largepersonlist/{largePersonGroupId}/train": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/largePersonGroupId"
+        }
+      ],
+      "get": {
+        "summary": "Large PersonList get training status",
+        "operationId": "LargePersonListgettrainingstatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "PersonList train",
+        "operationId": "PersonListtrain",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largepersonlist/": {
+      "get": {
+        "summary": "Large PersonList get all",
+        "operationId": "LargePersonListgetall",
+        "parameters": [{
+          "$ref":"#/components/parameters/start"
+        },{
+          "$ref":"#/components/parameters/top"
+        }],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largepersonlist/{largePersonGroupId}/person": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/largePersonGroupId"
+        }
+      ],
+      "post": {
+        "summary": "Large PersonListPerson create",
+        "operationId": "LargePersonListPersoncreate",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "userData": {
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/largepersonlist/{largePersonGroupId}/{largePersonId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/largePersonGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/largePersonId"
+        }
+      ],
+      "post": {
+        "summary": "Large PersonListPerson add face",
+        "operationId": "LargePersonListPersonaddface",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "required": [
-                  "file",
-                  "userData"
+                  "img"
                 ],
                 "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
+                  "img": {
+                    "type": "file",
+                    "format": "image/jpg",
+                    "description": "Send image of the person",
+                    "required": true
                   },
                   "userData": {
                     "type": "string",
-                    "example": "tom holland pic"
+                    "required": false
+                  },
+                  "targetFace": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "required": false
                   }
                 }
               },
@@ -781,12 +1889,81 @@
                 {
                   "key": "img",
                   "type": "file",
-                  "src": "/C:/Users/Prashant/Documents/System Integration/Final Project/testing_photos/tom_holland_2.png"
+                  "src": "../testing_photos/tom_holland_1.jpg"
                 },
                 {
-                  "key": "userData",
-                  "value": "tom holland pic",
-                  "type": "text"
+                  "key": "location",
+                  "value": "true",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Large PersonListPerson get all faces",
+        "operationId": "LargePersonListPersongetallfaces",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Large PersonListPerson Update person meta data",
+        "operationId": "LargePersonListPersonUpdateFace",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+               "properties": {
+                  "userData": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              },
+              "example": [
+                {
+                  "key": "img",
+                  "type": "file",
+                  "src": "../testing_photos/tom_holland_1.jpg"
+                },
+                {
+                  "key": "location",
+                  "value": "true",
+                  "type": "text",
+                  "disabled": true
                 }
               ]
             }
@@ -794,41 +1971,95 @@
         }
       }
     },
-    "/v1/personlist/friends-group/6e4c0924-60fc-4109-b7c2-5f5643216bb0": {
+    "/v1/largepersonlist/{personGroupId}/{largePersonId}/{persistedFaceId}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/personGroupId"
+        },
+        {
+          "$ref": "#/components/parameters/largePersonId"
+        },
+        {
+          "$ref": "#/components/parameters/persistedFaceId"
+        }
+      ],
       "delete": {
-        "summary": "PersonListPerson delete",
-        "operationId": "PersonListPersondelete",
+        "summary": "Large PersonListPerson delete face",
+        "operationId": "LargePersonListPersondeleteface",
         "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
           }
-        }
-      }
-    },
-    "/v1/personlist/person-list-1/7e5b4248-2ccb-46b1-817a-1220fa2c8f9f/009a5738-a578-4fee-b21c-2a40f516ca14": {
-      "delete": {
-        "summary": "PersonListPerson delete face",
-        "operationId": "PersonListPersondeleteface",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "headers": {}
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              }
+            }
           }
         }
-      }
-    },
-    "/v1/personlist/person-list-1/22c9ac94-e81a-4965-900e-aa3149bf37c3/a2785a0e-3dec-4e98-ac8d-b40a32d8785b": {
+      },
       "get": {
-        "summary": "PersonListPerson get face data",
-        "operationId": "PersonListPersongetfacedata",
+        "summary": "Large PersonListPerson Get face",
+        "operationId": "LargePersonListPersonGetFace",
         "parameters": [],
         "responses": {
           "200": {
             "description": "",
             "headers": {}
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "azureId": {
+                    "type": "string",
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Large Personlist meta data",
+        "operationId": "LargePersonListUpdate",
+        "responses": {
+          "200": {
+            "description": "",
+            "headers": {}
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userData": {
+                    "type": "string"
+                  },
+                  "azureId":{
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -853,6 +2084,60 @@
         "style": "form",
         "schema": {
           "type": "number"
+        }
+      },
+      "largeFaceListId": {
+        "name": "largeFaceListId",
+        "in": "path",
+        "description": "Large Face list Id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "personGroupId": {
+        "name": "personGroupId",
+        "in": "path",
+        "description": "Person Group Id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "largePersonGroupId": {
+        "name": "largePersonGroupId",
+        "in": "path",
+        "description": "Large Person Group Id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "largePersonId": {
+        "name": "largePersonId",
+        "in": "path",
+        "description": "Large Person Id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "personId": {
+        "name": "personId",
+        "in": "path",
+        "description": "Person Id",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "persistedFaceId": {
+        "name": "persistedFaceId",
+        "in": "path",
+        "description": "Persisted Face Id",
+        "required": true,
+        "schema": {
+          "type": "string"
         }
       }
     }

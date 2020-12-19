@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const upload = require("../middlewares/image.middleware");
+const uploadToAzure = require("../middlewares/azure.container.upload.middleware");
 const { createPersonList, deletePersonList, getPersonList, getPersonListTrainingStatus, getPersonLists, trainPersonList, updatePersonList, createPerson, addPersonFace, deletePerson, deletePersonFace,
   getPersonDetails, getPersonFaceDetails, updatePerson,
   updatePersonFace } = require("../service/person.list.large.service");
@@ -97,9 +98,9 @@ router.get('/:largePersonGroupId/:personId/:persistedFaceId', async (req, res) =
 
 router.get('/:largePersonGroupId', async (req, res) => {
   const { azureId } = req.body;
-  const { largePersonGroupId } = req.params;
+  const { largePersonGroupId, start, top } = req.params;
  
-  const response = await getPersonList(largePersonGroupId, azureId);
+  const response = await getPersonList(largePersonGroupId, start, top, azureId);
 
   if (response.error) {
     return res.status(response.status).send(response);

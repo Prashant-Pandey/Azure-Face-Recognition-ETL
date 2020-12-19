@@ -88,16 +88,16 @@ async function getPersonListFaces(personGroupId, start, top, azureId){
   return await connectAPI(`persongroups/${personGroupId}/persons`, params, {}, azureId, 'get');
 }
 
-async function getPersonLists(start, top, azureId) {
+async function getPersonLists(start='', top='', azureId) {
   const params = {
     returnRecognitionModel: true
   }
 
-  if (start) {
+  if (start&&start!=='') {
     params.start = start;
   }
 
-  if (top) {
+  if (top&&top!=='') {
     params.top = top;
   }
   return await connectAPI(`persongroups`, params, {}, azureId, 'get');

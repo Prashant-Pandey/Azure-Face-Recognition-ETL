@@ -96,7 +96,7 @@ router.delete('/:largeFaceListId', async (req, res) => {
     return res.status(response.status).send(response);
   }
 
-  res.json(response);
+  res.json({success: true});
 });
 
 // delete face inside face list

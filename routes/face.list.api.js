@@ -8,7 +8,7 @@ const {
 } = require("../service/face.list.service");
 
 // add a face to facelist
-router.post('/:faceListId/face', upload.single('img'), uploadToAzure, async (req, res) => {
+router.post('/:faceListId', upload.single('img'), uploadToAzure, async (req, res) => {
 
   const { userData, targetFace, azureId } = req.body;
 
@@ -22,6 +22,7 @@ router.post('/:faceListId/face', upload.single('img'), uploadToAzure, async (req
     res.status(response.status).json(response);
     return;
   }
+
 
   res.json(response)
 });
@@ -38,6 +39,7 @@ router.put('/:faceListId', async (req, res) => {
     faceListId
   } = req.params;
 
+  console.log(name, description, faceListId, azureId);
   const response = await createFaceList(name, description, faceListId, azureId);
 
   if (response.error) {

@@ -1,6 +1,8 @@
 const connectAPI = require("./api.service");
 const largeFaceListService = require("./face.list.large.service")
 const faceListService = require("./face.list.service")
+const personListService = require("./person.list.service");
+const largePersonListService = require("./person.list.large.service");
 
 async function createMessyGroup(faceIds, azureId) {
   const body = { faceIds };
@@ -29,8 +31,8 @@ async function faceTofaceVerification(face1Url, face2Url, azureId) {
   // detect faces and get the faceIds
   const faceId1 = await getFaceIdOnly(face1Url, azureId);
   const faceId2 = await getFaceIdOnly(face2Url, azureId);
-  if (faceId1.error||faceId2.error) {
-    return faceId1.error||faceId2.error;
+  if (faceId1.error || faceId2.error) {
+    return faceId1.error || faceId2.error;
   }
   // then get all the images and use verify 
   return await faceIdToFaceIdVerification(faceId1[0].faceId, faceId2[0].faceId, azureId);
@@ -46,14 +48,70 @@ async function faceToPersonVerification(faceId, personId, largePersonGroupId, az
   return await connectAPI('verify', {}, body, azureId, 'post');
 }
 
-async function indentify(largePersonGroupId, faceIds, maxFaceLimit, confidenceThreshold, azureId) {
+async function indentifyFaces(imgUrls, faceIds, personGroupId, largePersonGroupId, maxFaceLimit, confidenceThreshold, azureId) {
+  let toBeMatchFaceId = []
+  if (imgUrls && imgUrls.length > 0) {
+    // get faceids of all
+    for (let i = 0; i < imgUrls.length; i++) {
+      const faceDetect = await getFaceIdOnly(imgUrls[i], azureId);
+      if (faceDetect.error) {
+        return faceDetect;
+      }
+      toBeMatchFaceId.push(faceDetect[0].faceId);
+    }
+  } else {
+    toBeMatchFaceId = faceIds;
+  }
 
+  if (personGroupId || largePersonGroupId) {
+    return await fetchIdentifyFaces(toBeMatchFaceId, personGroupId, largePersonGroupId, maxFaceLimit, confidenceThreshold, azureId)
+  }
+
+  // get personGroupId
+  const personGroups = personListService.getPersonLists('', '', azureId);
+  for (let i = 0; i < personGroups.length; i++) {
+    // check for each person group
+    const personGroupIdTmp = personGroups[i].personGroupId;
+    const indentifiedface = await fetchIdentifyFaces(toBeMatchFaceId, personGroupIdTmp, largePersonGroupId, maxFaceLimit, confidenceThreshold, azureId);
+    if (!indentifiedface.error) {
+      return indentifiedface;
+    }
+  }
+  // get largePersonGroupId
+  const largePersonGroups = largePersonListService.getPersonLists('','',azureId);
+  for (let i = 0; i < largePersonGroups.length; i++) {
+    // check for each person group
+    const largePersonGroupIdTmp = largePersonGroups[i].personGroupId;
+    const indentifiedface = await fetchIdentifyFaces(toBeMatchFaceId, personGroupId, largePersonGroupIdTmp, maxFaceLimit, confidenceThreshold, azureId);
+    if (!indentifiedface.error) {
+      return indentifiedface;
+    }
+  }
+
+  return [];
+}
+
+async function fetchIdentifyFaces(faceIds, personGroupId, largePersonGroupId, maxFaceLimit, confidenceThreshold, azureId) {
   const body = {
-    largePersonGroupId,
-    faceIds,
-    maxNumOfCandidatesReturned: maxFaceLimit,
-    confidenceThreshold
+    faceIds
   };
+
+  if (personGroupId) {
+    body.personGroupId = personGroupId;
+  }
+
+  if (largePersonGroupId) {
+    body.largePersonGroupId = largePersonGroupId;
+  }
+
+  if (maxFaceLimit) {
+    body.maxNumOfCandidatesReturned = maxFaceLimit;
+  }
+
+  if (confidenceThreshold) {
+    body.confidenceThreshold = confidenceThreshold;
+  }
+
   return await connectAPI('identify', {}, body, azureId, 'post');
 }
 
@@ -96,12 +154,17 @@ async function getSimilarFaces(imageUrl, faceId, faceListId, largeFaceListId, fa
 
     // detect face and get the faceid only
     const faceDetect = await getFaceIdOnly(imageUrl, azureId);
-    if (faceDetect.length > 1) {
+
+    if (faceDetect.length > 1 || faceDetect.length === 0) {
       return {
         error: true,
         status: 400,
         message: 'Please send a image of a single person.'
       }
+    }
+
+    if (faceDetect.error) {
+      return faceDetect;
     }
 
     const faceId = faceDetect[0].faceId;
@@ -180,11 +243,11 @@ async function generateReturnFaceAttribute(features = false, noises = false, emo
   let returnStr = '';
 
   if (features) {
-    returnStr += 'headPose,glasses,facialHair,blur,makeup,accessories,hair,';
+    returnStr += 'headPose,glasses,facialHair,makeup,accessories,hair,';
   }
 
   if (noises) {
-    returnStr += 'occlusion,exposure,noise,';
+    returnStr += 'occlusion,exposure,noise,blur,';
   }
 
   if (emotions) {
@@ -192,7 +255,7 @@ async function generateReturnFaceAttribute(features = false, noises = false, emo
   }
 
   if (characterstics) {
-    returnStr += 'age,gender'
+    returnStr += 'age,gender,'
   }
 
   return returnStr.substr(0, returnStr.length - 1);
@@ -244,6 +307,6 @@ module.exports = {
   getLimitedFaceDetection,
   getSimilarFaces,
   createMessyGroup,
-  indentify,
+  indentifyFaces,
   verify
 }

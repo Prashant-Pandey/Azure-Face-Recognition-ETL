@@ -72,23 +72,30 @@ async function deletePersonList(largePersonGroupId, azureId) {
   return await connectAPI(`largepersongroups/${largePersonGroupId}`, {}, {}, azureId, 'delete');
 }
 // get only one large person list
-async function getPersonList(largePersonGroupId, azureId) {
+async function getPersonList(largePersonGroupId, start, top, azureId) {
   const params = {
     returnRecognitionModel: true
+  }
+  if (start){
+    params.start = start;
+  }
+
+  if(top){
+    params.top = top;
   }
   return await connectAPI(`largepersongroups/${largePersonGroupId}`, params, {}, azureId, 'get');
 }
 // get all large person lists with filters too
-async function getPersonLists(start, top, azureId) {
+async function getPersonLists(start='', top='', azureId) {
   const params = {
     returnRecognitionModel: true
   }
 
-  if (start) {
+  if (start&&start!=='') {
     params.start = start;
   }
 
-  if (top) {
+  if (top&&top!=='') {
     params.top = top;
   }
   return await connectAPI(`largepersongroups`, params, {}, azureId, 'get');
@@ -120,7 +127,6 @@ async function updatePersonList(largePersonGroupId, name = '', userData = '', az
 module.exports = {
   createPersonList,
   deletePersonList,
-  deleteFaceFromFaceList,
   getPersonLists,
   getPersonList,
   getPersonListTrainingStatus,
